@@ -21,6 +21,17 @@
 
 #define COMPUTER 1
 #define HUMAN 2
+
+#define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+
 /**
  * Calculate the total score of a series of pieces.
  * @param count The amount of selected pieces

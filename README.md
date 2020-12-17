@@ -30,7 +30,7 @@
 
 4. 函数接口：
 
-   - ``void ShowTablet(void)`` 在屏幕上打印出当前的棋盘
+   - ``void showTablet(void)`` 在屏幕上打印出当前的棋盘
    - ``void AINext(void)`` AI进行下一步下棋
    - ``void PutChess(int a, int b)`` 在坐标为（a，b）的位置放下一颗棋子
    - ``bool Win(int a, int b)``检查在坐标为（a, b）的位置放下棋子后是否能获胜

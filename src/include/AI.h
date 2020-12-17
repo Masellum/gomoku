@@ -57,5 +57,9 @@ Position *generateListOfAvailablePositions(int board[15][15], int computerScoreA
  */
 int evaluate(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15], int role);
 
+int stupidAINext();//简单AI下棋子,并返回是否赢下比赛
+
+int geniusAINext();//困难AI下棋子,并返回是否赢下比赛
+
 #endif // _AI_H
 

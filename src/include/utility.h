@@ -33,6 +33,14 @@
      _a < _b ? _a : _b; })
 
 /**
+ * We assume that (0, 0) is the left-top corner of the board
+ */
+typedef struct {
+    int x, y;
+    int role;
+} Position;
+
+/**
  * Calculate the total score of a series of pieces.
  * @param count The amount of selected pieces
  * @param block The amount of blocking pieces (Rival's pieces or walls)

@@ -1,7 +1,10 @@
 #ifndef UI_H
 #define UI_H
 
+#include "utility.h"
+
 #include <time.h>
+#include <stdbool.h>
 
 /**
  * 打印欢迎信息
@@ -26,23 +29,9 @@ int startGame();
 int chooseDifficulty();
 
 /**
- *
+ * @return the initiative player, 1 or 2
  */
 int chooseInitiative();
-
-/**
- * 单人模式处理函数
- * <br />
- * Handle single mode
- */
-void singleModeHandler();
-
-/**
- * 双人模式处理函数
- * <br />
- * Handle double mode
- */
-void doubleModeHandler();
 
 /**
  * 显示当前的棋盘 (15 * 15)
@@ -54,7 +43,7 @@ void showTablet(int board[15][15]);
  * @param player 1 stands for computer while 2 stands for human
  * @return A bool value, presenting win state
  */
-int askNext(int player);
+Position askNext(int player);
 
 /**
  * 显示已下时间
@@ -68,11 +57,9 @@ void showTime(time_t beginTime, time_t endTime);
 void printResult(int player);
 
 /**
- * Start a new round for the given player.
- * @param player
- * @return A bool value presents the given player's win state
+ *
  */
-int startRound(int player);
+bool askReplay();
 
 /**
  * 提示再见信息，询问是否重新开始

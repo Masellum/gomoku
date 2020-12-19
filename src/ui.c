@@ -1,6 +1,7 @@
 #include "ui.h"
 #include "AI.h"
 #include "board.h"
+#include "control.h"
 
 #include <stdio.h>
 
@@ -21,48 +22,7 @@ int chooseDifficulty() {
     return ret;
 }
 
-void singleModeHandler() {
-    int difficulty = chooseDifficulty();
-    if (difficulty == 1) {
-        while (1) {
-            if (stupidAINext()) {
-                printResult(1);
-                break;
-            }
-            if (askNext(2)) {
-                printResult(2);
-                break;
-            }
-        }
-    } else if (difficulty == 2) {
-        while (1) {
-            if (geniusAINext()) {
-                printResult(1);
-                break;
-            }
-            if (askNext(2)) {
-                printResult(2);
-                break;
-            }
-        }
-    }
-}
-
-void doubleModeHandler() {
-    puts("欢迎来到双人对战模式");
-    while (1) {
-        if (askNext(1)) {
-            printResult(1);
-            break;
-        }
-        if (askNext(2)) {
-            printResult(2);
-            break;
-        }
-    }
-}
-
-int askNext(int player) {
+Position askNext(int player) {
     printf("当前执棋：");
     if (player == 1)printf("白棋\n");
     else printf("黑棋\n");
@@ -78,9 +38,8 @@ int askNext(int player) {
         puts("请输入下棋的坐标,两坐标用空格隔开：");
         int a, b;
         scanf("%d%d", &a, &b);
-        if (!CheckChess(a, b)) goto GetChess;
-        int ret = PutChess(player, a, b);
-        Record("PutChess", player, a, b);
+        if (!checkPositionAvailable(a, b)) goto GetChess;
+        Position ret = {a, b};
         return ret;
     } else if (choice == 2) {
         puts("你确认要悔棋吗？确认请输入1");

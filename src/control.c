@@ -5,7 +5,11 @@
 
 #include <stdbool.h>
 
-
+bool singleModeMove(twoDimensionalArray board, int player) {
+    Position position = askNext(player);
+    putChess(board, player, position.x, position.y);
+    return checkWinOrNotAtPosition(board, position.x, position.y, player);
+}
 
 void gameLoop(twoDimensionalArray board, roundHandler sente, roundHandler gote, int player) {
    bool initiative = true, win = false;

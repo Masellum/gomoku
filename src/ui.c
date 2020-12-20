@@ -39,7 +39,7 @@ Position askNext(int player) {
         int a, b;
         scanf("%d%d", &a, &b);
         if (!checkPositionAvailable(a, b)) goto GetChess;
-        Position ret = {a, b};
+        Position ret = {player, a, b};
         return ret;
     } else if (choice == 2) {
         puts("你确认要悔棋吗？确认请输入1");

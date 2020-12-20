@@ -1,10 +1,9 @@
 #ifndef UI_H
 #define UI_H
 
-#include "utility.h"
+extern int initiative = 0;
 
 #include <time.h>
-#include <stdbool.h>
 
 /**
  * 打印欢迎信息
@@ -29,9 +28,29 @@ int startGame();
 int chooseDifficulty();
 
 /**
- * @return the initiative player, 1 or 2
+ *
  */
 int chooseInitiative();
+
+/**
+ * 单人模式处理函数
+ * <br />
+ * Handle single mode
+ */
+void singleModeHandler();
+
+/**
+ * 双人模式处理函数
+ * <br />
+ * Handle double mode
+ */
+void doubleModeHandler();
+
+/**
+ * 用于把数字转化成具体棋子 
+ */
+char TransformChessPieces(int flag);
+
 
 /**
  * 显示当前的棋盘 (15 * 15)
@@ -57,13 +76,15 @@ void showTime(time_t beginTime, time_t endTime);
 void printResult(int player);
 
 /**
- *
+ * Start a new round for the given player.
+ * @param player
+ * @return A bool value presents the given player's win state
  */
-bool askReplay();
+int startRound(int player);
 
 /**
  * 提示再见信息，询问是否重新开始
  */
 void printGoodbye();
 
-#endif //UI_H
+#endif // UI_H

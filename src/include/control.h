@@ -38,6 +38,9 @@ void singleModeHandler();
  */
 void doubleModeHandler();
 
+int getInitiative();
+void setInitiative();
+
 void Regret(void);//撤销上一步操作
 void Surrender(int player);//用户投降
 

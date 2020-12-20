@@ -5,9 +5,6 @@
 
 #include <stdio.h>
 
-
-
-
 int main(void) {
     printHello();
     while (true) {

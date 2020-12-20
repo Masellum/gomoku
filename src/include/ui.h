@@ -1,7 +1,8 @@
 #ifndef UI_H
 #define UI_H
 
-extern int initiative = 0;
+#include "utility.h"
+
 
 #include <time.h>
 #include <stdbool.h>
@@ -48,9 +49,11 @@ void singleModeHandler();
 void doubleModeHandler();
 
 /**
- * 用于把数字转化成具体棋子 
+ * 用于把数字转化成具体棋子
+ * use marco to avoid cross-platform unicode problem
  */
-char TransformChessPieces(int flag);
+#define transformChessPieces(flag) ((flag) == 0 ? "＋" : ((flag) == getInitiative() ? "●" : "○"))
+//char TransformChessPieces(int flag);
 
 
 /**
@@ -77,11 +80,10 @@ void showTime(time_t beginTime, time_t endTime);
 void printResult(int player);
 
 /**
- * Start a new round for the given player.
- * @param player
- * @return A bool value presents the given player's win state
+ * ask if the player wants to replay
+ * @return true if the player wants to replay
  */
-int startRound(int player);
+bool askReplay();
 
 /**
  * 提示再见信息，询问是否重新开始

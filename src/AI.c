@@ -116,3 +116,13 @@ int evaluate(int board[15][15], int computerScoreArray[15][15], int humanScoreAr
     return (role == COMPUTER ? 1 : -1) * (maxScoreOfComputer - maxScoreOfHuman);
 }
 
+bool stupidAINext(int board[15][15], int player) {
+    // TODO
+    return false;
+}
+
+
+bool geniusAINext(int board[15][15], int player) {
+    // TODO
+    return false;
+}

@@ -4,17 +4,18 @@
 #include "control.h"
 
 #include <stdio.h>
+#include <time.h>
+
 
 void printHello() {
     puts("欢迎来到趣味横生、老少皆宜、可以提高智力、让你走上人生巅峰的五子棋游戏！");
 }
 
-int startGame(void) {
+int startGame() {
     puts("请选择单机对战AI模式(输入1)或双人对战模式(输入2)");
     int mode;
     scanf("%d", &mode);
-    if (mode == 1) singleModeHandler();
-    else doubleModeHandler();
+    return mode;
 }
 
 int chooseDifficulty() {
@@ -28,54 +29,54 @@ int chooseDifficulty() {
 
 int chooseInitiative() {
     int flag;
-    
+
     puts("请选择先后手：");
     puts("先手请输入\"1\"，后手请输入\"2\"");
-    
+
     scanf("%d", &flag);
-    
-    if(flag == 1)
+
+    if (flag == 1)
         return 2;
-    else if(flag == 2)
+    else if (flag == 2)
         return 1;
+    else return 0;
 }
 
-char transformChessPieces(int flag) {
-    if(flag == 0)
-        return '＋' ;
-    else if(flag == initiative) 
-        return '●';
-    else
-        return '○';
-}
+//char transformChessPieces(int flag) {
+//    if(flag == 0)
+//        return '＋' ;
+//    else if(flag == initiative)
+//        return '●';
+//    else
+//        return '○';
+//}
 
 void showTablet(int board[15][15]) {
-    int i, j; 
-    
+    int i, j;
+
     printf("    ");
-    
-    for(i = 1; i <= 15; i++)
+
+    for (i = 1; i <= 15; i++)
         printf("%-4d", i);
-        
+
     printf("\n\n");
-    
-    for(i = 1; i <= 15; i++)
-    {
+
+    for (i = 1; i <= 15; i++) {
         printf("%2d  ", i);
-        
-        for(j = 1; j <= 14; j++)
-            printf("%c==", TransformChessPieces(board[i][j]));
-            
-        printf("%c\n", TransformChessPieces(board[i][15]));
-        
-        if(i == 15)
+
+        for (j = 1; j <= 14; j++)
+            printf("%s==", transformChessPieces(board[i][j]));
+
+        printf("%s\n", transformChessPieces(board[i][14]));
+
+        if (i == 15)
             break;
-        
+
         printf("  ");
-        
-        for(j = 1; j <= 15; j++)
+
+        for (j = 1; j <= 15; j++)
             printf("  ‖");
-        
+
         printf("\n");
     }
 }
@@ -117,11 +118,24 @@ Position askNext(int player) {
     }
 }
 
+void showTime(time_t beginTime, time_t endTime) {
+    double timeDifference = difftime(endTime, beginTime);
+    printf("游戏已经进行了 %d 秒", (int)timeDifference);
+}
+
 void printResult(int player) {
-    if(player == initiative)
+    if (player == getInitiative())
         puts("恭喜黑棋获胜！");
     else
         puts("恭喜白棋获胜！");
+}
+
+bool askReplay() {
+    puts("游戏已经结束，请问您是否想要再来一局？");
+    puts("是请输入1， 否请输入0");
+    int res;
+    scanf("%d", &res);
+    return (bool)(res);
 }
 
 void printGoodbye() {

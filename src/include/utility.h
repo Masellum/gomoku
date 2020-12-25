@@ -1,6 +1,8 @@
 #ifndef _UTILITY_H
 #define _UTILITY_H
 
+#include "vector.h"
+
 #include <stdbool.h>
 
 // Define value of situation of single chess
@@ -61,6 +63,7 @@ int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int role,
  * i.e. swap 1 and 2.
  */
 int reverseRole(int role);
+
 /**
  * Check if a given position (x, y) has <i>count</i> neighbors in no more than <i>distance</i> steps.
  */

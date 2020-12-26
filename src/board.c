@@ -20,17 +20,16 @@ void putChess(twoDimensionalArray board, int player, int x, int y) {
     board[x][y] = player;
 }
 
-int checkWinOrNotAtPosition(twoDimensionalArray board, int x, int y, int player) {
+bool checkWinOrNotAtPosition(twoDimensionalArray board, int x, int y, int player) {
+    return evaluatePosition(board, x, y, player) >= FIVE;
+}
+
+bool checkWinOrNot(twoDimensionalArray board) {
     // TODO
     return 0;
 }
 
-int checkWinOrNot(twoDimensionalArray board) {
-    // TODO
-    return 0;
-}
-
-int checkIfBoardIsFull(twoDimensionalArray board) {
+bool checkIfBoardIsFull(twoDimensionalArray board) {
     // TODO
     return false;
 }
@@ -39,7 +38,7 @@ void recordPutChess(char *type, int player, int a, int b) {
     // TODO
 }
 
-int checkPositionAvailable(int a, int b) {
+bool checkPositionAvailable(int a, int b) {
     // TODO
     return 1;
 }

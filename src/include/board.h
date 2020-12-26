@@ -32,19 +32,19 @@ void putChess(twoDimensionalArray board, int player, int x, int y);
 /**
  * 检查在坐标为 (x, y) 的位置放下棋子后是否能获胜
  */
-int checkWinOrNotAtPosition(twoDimensionalArray board, int x, int y, int player);
+bool checkWinOrNotAtPosition(twoDimensionalArray board, int x, int y, int player);
 
 /**
  *
  * @return
  */
-int checkWinOrNot(twoDimensionalArray board);
+bool checkWinOrNot(twoDimensionalArray board);
 
 /**
  *
  */
-int checkIfBoardIsFull(twoDimensionalArray board);//检查棋盘是否填满
+bool checkIfBoardIsFull(twoDimensionalArray board);//检查棋盘是否填满
 void recordPutChess(char *type, int player, int a, int b);//记录在（a，b）位置下了一颗棋子
-int checkPositionAvailable(int a, int b);//返回在（a，b）落子是否符合规范，如果不符合，打印错误信息
+bool checkPositionAvailable(int a, int b);//返回在（a，b）落子是否符合规范，如果不符合，打印错误信息
 
 #endif // _BOARD_H

@@ -52,39 +52,30 @@ int chooseInitiative() {
 //}
 
 void showTablet(int board[15][15]) {
-    int i, j;
-
     printf("    ");
-
-    for (i = 1; i <= 15; i++)
+    for (int i = 1; i <= 15; i++)
         printf("%-4d", i);
-
     printf("\n\n");
-
-    for (i = 1; i <= 15; i++) {
-        printf("%2d  ", i);
-
-        for (j = 1; j <= 14; j++)
+    for (int i = 0; i < 15; i++) {
+        printf("%2d  ", i + 1);
+        for (int j = 0; j < 14; j++) {
             printf("%s==", transformChessPieces(board[i][j]));
-
+        }
         printf("%s\n", transformChessPieces(board[i][14]));
-
-        if (i == 15)
+        if (i == 14) {
             break;
-
+        }
         printf("  ");
-
-        for (j = 1; j <= 15; j++)
+        for (int j = 1; j <= 15; j++)
             printf("  ‖");
-
         printf("\n");
     }
 }
 
 Position askNext(int player) {
     printf("当前执棋：");
-    if (player == 1)printf("白棋\n");
-    else printf("黑棋\n");
+    if (player == getInitiative()) printf("黑棋\n");
+    else printf("白棋\n");
     Ask:
     puts("轮到你了！请选择以下几种操作之一：");
     puts("1. 下棋");
@@ -98,7 +89,7 @@ Position askNext(int player) {
         int a, b;
         scanf("%d%d", &a, &b);
         if (!checkPositionAvailable(a, b)) goto GetChess;
-        Position ret = {player, a, b};
+        Position ret = {a - 1, b - 1, player};
         return ret;
     } else if (choice == 2) {
         puts("你确认要悔棋吗？确认请输入1");
@@ -120,7 +111,7 @@ Position askNext(int player) {
 
 void showTime(time_t beginTime, time_t endTime) {
     double timeDifference = difftime(endTime, beginTime);
-    printf("游戏已经进行了 %d 秒", (int)timeDifference);
+    printf("游戏已经进行了 %d 秒", (int) timeDifference);
 }
 
 void printResult(int player) {
@@ -135,7 +126,7 @@ bool askReplay() {
     puts("是请输入1， 否请输入0");
     int res;
     scanf("%d", &res);
-    return (bool)(res);
+    return (bool) (res);
 }
 
 void printGoodbye() {

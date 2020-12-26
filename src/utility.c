@@ -169,7 +169,7 @@ searchOnOneDirection:
     }
     count += counterCount;
 
-    return countToScore(count, block, empty);
+    return countToScore(count + 1, block, empty);
 #undef nx
 #undef ny
 }

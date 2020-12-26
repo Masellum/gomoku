@@ -33,7 +33,7 @@ void updateScoreOfBoard(int board[15][15], int computerScoreArray[15][15], int h
 
 void updateScoreOfPositionOnSingleDirection(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y,
                                             int direction) {
-    int role = board[x][y], score = 0;
+    int role = board[x][y], score;
     if (role != HUMAN) {
         score = evaluatePositionOnSingleDirection(board, x, y, COMPUTER, direction);
         *pComputerScore += score;
@@ -53,7 +53,7 @@ void updateScoreOfPosition(int board[15][15], int *pComputerScore, int *pHumanSc
             if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) {
                 continue;
             }
-            updateScoreOfPositionOnSingleDirection(board, x, y, pComputerScore, pHumanScore, d);
+            updateScoreOfPositionOnSingleDirection(board, pComputerScore, pHumanScore, x, y, d);
         }
     }
 }

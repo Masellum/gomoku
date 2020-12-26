@@ -1,9 +1,6 @@
 #include "ui.h"
 #include "AI.h"
-#include "board.h"
 #include "control.h"
-
-#include <stdio.h>
 
 int main(void) {
     printHello();

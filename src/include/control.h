@@ -17,7 +17,7 @@ typedef bool (*roundHandler)(twoDimensionalArray board, int player);
  * @param player the given player
  * @return whether the player won after the round
  */
-bool singleModeMove(twoDimensionalArray board, int player);
+bool doubleModeMove(twoDimensionalArray board, int player);
 
 /**
  * start the

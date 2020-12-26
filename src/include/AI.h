@@ -2,7 +2,6 @@
 #define _AI_H
 
 #include "utility.h"
-#include "board.h"
 
 /**
  * Evaluate the score of a position, considering all directions.

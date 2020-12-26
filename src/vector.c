@@ -34,7 +34,7 @@ void vectorResizeTo(Vector *v, size_t size) {
 
 void vectorPushBack(Vector *v, int val) {
     if (v->count == v->size) {
-        vectorResize(&v);
+        vectorResize(v);
     }
     v->innerArray[v->count] = val;
     v->count++;

@@ -1,4 +1,6 @@
 #include "utility.h"
+#include "vector.h"
+#include "map.h"
 
 #include <stdbool.h>
 

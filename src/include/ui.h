@@ -1,5 +1,5 @@
-#ifndef UI_H
-#define UI_H
+#ifndef _UI_H
+#define _UI_H
 
 #include "utility.h"
 
@@ -62,16 +62,22 @@ void doubleModeHandler();
 void showTablet(int board[15][15]);
 
 /**
+ * Send message to front-end.
+ * @param message
+ */
+void sendMessage(char message[]);
+
+/**
  * 请求用户执行操作，如果下棋,放置棋子到棋盘中,并返回是否赢下比赛
  * @param player 1 stands for computer while 2 stands for human
  * @return A bool value, presenting win state
  */
-Position askNext(int player);
+Position askNext(int board[15][15], int player);
 
 /**
  * 显示已下时间
  */
-void showTime(time_t beginTime, time_t endTime);
+//void showTime(time_t beginTime, time_t endTime);
 
 /**
  * 显示胜负信息

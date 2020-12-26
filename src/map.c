@@ -101,4 +101,6 @@ int selectInMap(Map *map, int key) {
 void freeMap(Map *map) {
     freeNode(map, map->root);
     free(map->nil);
+    map->root = NULL;
+    map->nil = NULL;
 }

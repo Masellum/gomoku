@@ -1,6 +1,7 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef _VECTOR_H
+#define _VECTOR_H
 
+#include <string.h>
 #include <stddef.h>
 
 #define min(a,b) \
@@ -9,22 +10,28 @@
      _a < _b ? _a : _b; })
 
 typedef struct {
-    int *innerArray;
-    size_t size, count;
+    void *innerArray;
+    size_t size, count, sizeOfVal;
 } Vector;
 
-void vectorInit(Vector *v, int size);
+typedef unsigned char byte;
+
+void vectorInit(Vector *v, size_t size, size_t sizeOfVal);
 
 void vectorDelete(Vector *v);
 
-void vectorPushBack(Vector *v, int val);
+void vectorPushBack(Vector *v, void *val);
 
-void vectorPopBack(Vector *v, int val);
+void vectorPopBack(Vector *v);
 
-int vectorFront(Vector *v);
+void *vectorFront(Vector *v);
 
-int vectorBack(Vector *v);
+void *vectorBack(Vector *v);
 
-int vectorAt(Vector *v, size_t index);
+void *vectorAt(Vector *v, size_t index);
+
+Vector vectorConcatenate(Vector a, Vector b);
+
+void vectorCopy(Vector *destination, Vector *source);
 
 #endif // VECTOR_H

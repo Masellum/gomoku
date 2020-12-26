@@ -4,62 +4,79 @@
 #include <stdlib.h>
 
 
-void vectorInit(Vector *v, int size) {
+void vectorInit(Vector *v, size_t size, size_t sizeOfVal) {
     v->size = size;
     v->count = 0;
-    v->innerArray = (int *)malloc(sizeof(int) * size);
+    v->sizeOfVal = sizeOfVal;
+    v->innerArray = malloc(sizeOfVal * size);
 }
 
 void vectorDelete(Vector *v) {
     free(v->innerArray);
+    v->innerArray = NULL;
 }
 
 void vectorResize(Vector *v) {
-    int *t = (int *)malloc(sizeof(int) * v->size * 2);
-    for (int i = 0; i < v->count; ++i) {
-        t[i] = v->innerArray[i];
-    }
+    void *t = malloc(v->sizeOfVal * v->size * 2);
+    memcpy(t, v->innerArray, v->sizeOfVal * v->size);
     free(v->innerArray);
     v->innerArray = t;
 }
 
 void vectorResizeTo(Vector *v, size_t size) {
-    int *t = (int *)malloc(sizeof(int) * v->size);
-    for (int i = 0; i < min(v->size, size); ++i) {
-        t[i] = v->innerArray[i];
-    }
+    void *t = malloc(v->sizeOfVal * v->size);
+    memcpy(t, v->innerArray, v->sizeOfVal * min(v->size, size));
     free(v->innerArray);
     v->innerArray = t;
 }
 
-void vectorPushBack(Vector *v, int val) {
+void vectorPushBack(Vector *v, void *val) {
     if (v->count == v->size) {
         vectorResize(v);
     }
-    v->innerArray[v->count] = val;
+    memcpy(v->innerArray + v->sizeOfVal * v->count, val, v->sizeOfVal);
+//    v->innerArray[v->count] = val;
     v->count++;
 }
 
-void vectorPopBack(Vector *v, int val) {
+void vectorPopBack(Vector *v) {
     assert(v->count > 0);
-    v->innerArray[v->count - 1] = 0;
+    memset(v->innerArray + v->sizeOfVal * (v->count - 1), 0, v->sizeOfVal);
+//    v->innerArray[v->count - 1] = 0;
     v->count--;
     if (v->count < v->size / 2) {
         vectorResizeTo(v, v->size / 2);
     }
 }
 
-int vectorFront(Vector *v) {
+void *vectorFront(Vector *v) {
     assert(v->count > 0);
-    return v->innerArray[0];
+    return v->innerArray;
 }
 
-int vectorBack(Vector *v) {
+void *vectorBack(Vector *v) {
     assert(v->count > 0);
-    return v->innerArray[v->count - 1];
+    return (void *)((byte *)v->innerArray + v->sizeOfVal * (v->count - 1));
 }
 
-int vectorAt(Vector *v, size_t index) {
+void *vectorAt(Vector *v, size_t index) {
     assert(index < v->count);
-    return v->innerArray[index];
+    return (void *)((byte *)v->innerArray + v->sizeOfVal * index);
+}
+
+Vector vectorConcatenate(Vector a, Vector b) {
+    assert(a.sizeOfVal == b.sizeOfVal);
+    void *t = malloc(a.sizeOfVal * (a.size + b.size));
+    memcpy(t, a.innerArray, a.sizeOfVal * a.count);
+    memcpy((void *)((byte *)t + a.sizeOfVal * a.count), b.innerArray, a.sizeOfVal * b.count);
+    Vector res = (Vector){t, a.size + b.size, a.count + b.count, a.sizeOfVal};
+    return res;
+}
+
+void vectorCopy(Vector *destination, Vector *source) {
+    if (destination->innerArray != NULL) {
+        vectorDelete(destination);
+    }
+    destination->innerArray = malloc(source->sizeOfVal * source->size);
+    memcpy(destination->innerArray, source->innerArray, source->sizeOfVal * source->size);
 }

@@ -4,7 +4,7 @@
 #include "control.h"
 
 #include <stdio.h>
-#include <time.h>
+//#include <time.h>
 
 
 void printHello() {
@@ -19,11 +19,14 @@ int startGame() {
 }
 
 int chooseDifficulty() {
-    GetDifficulty:
-    puts("请选择AI难度：简单(1),困难(2)");
     int ret;
-    scanf("%d", &ret);
-    if (ret != 1 && ret != 2) goto GetDifficulty;
+    while (true) {
+        puts("请选择AI难度：简单(1),困难(2)");
+        scanf("%d", &ret);
+        if (ret != 1 && ret != 2) {
+            puts("请输入正确的数字！");
+        } else break;
+    }
     return ret;
 }
 
@@ -42,14 +45,6 @@ int chooseInitiative() {
     else return 0;
 }
 
-//char transformChessPieces(int flag) {
-//    if(flag == 0)
-//        return '＋' ;
-//    else if(flag == initiative)
-//        return '●';
-//    else
-//        return '○';
-//}
 
 void showTablet(int board[15][15]) {
     printf("    ");
@@ -72,47 +67,55 @@ void showTablet(int board[15][15]) {
     }
 }
 
-Position askNext(int player) {
+void sendMessage(char message[]) {
+    printf("%s", message);
+}
+
+Position askNext(int board[15][15], int player) {
     printf("当前执棋：");
     if (player == getInitiative()) printf("黑棋\n");
     else printf("白棋\n");
-    Ask:
-    puts("轮到你了！请选择以下几种操作之一：");
-    puts("1. 下棋");
-    puts("2. 悔棋");
-    puts("3. 认输");
-    int choice;
-    scanf("%d", &choice);
-    if (choice == 1) {
-        GetChess:
-        puts("请输入下棋的坐标,两坐标用空格隔开：");
-        int a, b;
-        scanf("%d%d", &a, &b);
-        if (!checkPositionAvailable(a, b)) goto GetChess;
-        Position ret = {a - 1, b - 1, player};
-        return ret;
-    } else if (choice == 2) {
-        puts("你确认要悔棋吗？确认请输入1");
-        int tmp;
-        scanf("%d", &tmp);
-        if (tmp == 1) Regret();
-        else goto Ask;
-    } else if (choice == 3) {
-        puts("你确认要认输吗？确认请输入1");
-        int tmp;
-        scanf("%d", &tmp);
-        if (tmp == 1) Surrender(player);
-        else goto Ask;
-    } else {
-        puts("输入不合法！");
-        goto Ask;
+    while (true) {
+        puts("轮到你了！请选择以下几种操作之一：");
+        puts("1. 下棋");
+        puts("2. 悔棋");
+        puts("3. 认输");
+        int choice;
+        scanf("%d", &choice);
+        if (choice == 1) {
+            int a, b;
+            while (true) {
+                puts("请输入下棋的坐标,两坐标用空格隔开：");
+                scanf("%d%d", &a, &b);
+                if (!checkPositionAvailable(board, a, b)) {
+                    puts("坐标不合法！请重新输入：");
+                } else break;
+            }
+            Position ret = {a - 1, b - 1, player};
+            return ret;
+        } else if (choice == 2) {
+            puts("你确认要悔棋吗？确认请输入1");
+            int tmp;
+            scanf("%d", &tmp);
+            if (tmp == 1) Regret();
+            else continue;
+        } else if (choice == 3) {
+            puts("你确认要认输吗？确认请输入1");
+            int tmp;
+            scanf("%d", &tmp);
+            if (tmp == 1) Surrender(player);
+            else continue;
+        } else {
+            puts("输入不合法！");
+            continue;
+        }
     }
 }
 
-void showTime(time_t beginTime, time_t endTime) {
-    double timeDifference = difftime(endTime, beginTime);
-    printf("游戏已经进行了 %d 秒", (int) timeDifference);
-}
+//void showTime(time_t beginTime, time_t endTime) {
+//    double timeDifference = difftime(endTime, beginTime);
+//    printf("游戏已经进行了 %d 秒", (int) timeDifference);
+//}
 
 void printResult(int player) {
     if (player == getInitiative())

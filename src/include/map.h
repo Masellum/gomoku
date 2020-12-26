@@ -1,5 +1,5 @@
-#ifndef MAP_H
-#define MAP_H
+#ifndef _MAP_H
+#define _MAP_H
 
 /**
  * A key-value map supporting inserting, erasing and selecting, implemented in Treap.

@@ -2,6 +2,8 @@
 #include "vector.h"
 #include "map.h"
 
+#include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 int countToScore(int count, int block, int empty) {
@@ -120,7 +122,7 @@ int countToScore(int count, int block, int empty) {
     return 0;
 }
 
-int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int role, int direction) {
+int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int player, int direction) {
 #define nx (x + i * dx * reversed)
 #define ny (y + i * dy * reversed)
     int block = 0, count = 0, counterCount = 0, empty = -1;
@@ -139,7 +141,7 @@ searchOnOneDirection:
         }
         int t = board[nx][ny];
         if (t == 0) {
-            if (empty == -1 && board[nx + 1 * (dx != 0)][ny + 1 * (dy != 0)] == role) {
+            if (empty == -1 && board[nx + 1 * (dx != 0)][ny + 1 * (dy != 0)] == player) {
                 if (reversed == 1) {
                     empty = count;
                 } else {
@@ -150,7 +152,7 @@ searchOnOneDirection:
                 break;
             }
         }
-        if (t == role) {
+        if (t == player) {
             if (reversed == 1) {
                 count++;
             } else {
@@ -174,7 +176,20 @@ searchOnOneDirection:
 #undef ny
 }
 
-int reverseRole(int role) { return role ^ 3; } // 1 ^ 3 == 2, 2 ^ 3 == 1
+void updateScoreOfPositionOnSingleDirection(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y,
+                                            int direction) {
+    int player = board[x][y], score;
+    if (player != HUMAN) {
+        score = evaluatePositionOnSingleDirection(board, x, y, COMPUTER, direction);
+        *pComputerScore += score;
+    } else *pComputerScore = 0;
+    if (player != COMPUTER) {
+        score = evaluatePositionOnSingleDirection(board, x, y, HUMAN, direction);
+        *pHumanScore += score;
+    } else *pHumanScore = 0;
+}
+
+int reverseRole(int player) { return player ^ 3; } // 1 ^ 3 == 2, 2 ^ 3 == 1
 
 bool hasNeighbor(int board[15][15], int x, int y, int distance, int count) {
     int startX = x - distance, startY = y - distance, endX = x + distance, endY = y + distance;

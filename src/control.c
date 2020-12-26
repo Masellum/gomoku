@@ -5,23 +5,37 @@
 
 #include <stdbool.h>
 
-int initiative;
+static int initiative;
 
-bool doubleModeMove(twoDimensionalArray board, int player) {
-    Position position = askNext(player);
-    putChess(board, player, position.x, position.y);
-    return checkWinOrNotAtPosition(board, position.x, position.y, player);
+int getInitiative() {
+    return initiative;
 }
 
-void gameLoop(twoDimensionalArray board, roundHandler sente, roundHandler gote, int player) {
+void setInitiative(int x) {
+    initiative = x;
+}
+
+Position doubleModeMove(int board[15][15], int player) {
+    return askNext(board, player);
+}
+
+void gameLoop(int board[15][15], roundHandler sente, roundHandler gote, int player) {
    bool _initiative = true, win = false;
    while (true) {
        showTablet(board);
-       if (_initiative) {
-           win = sente(board, player);
-       } else {
-           win = gote(board, player);
+       Position pos;
+       while (true) {
+           if (_initiative) {
+               pos = sente(board, player);
+           } else {
+               pos = gote(board, player);
+           }
+           if (!isPositionAvailable(board, pos)) {
+               sendMessage("操作不合法！请重新选择操作。");
+           } else break;
        }
+       putChess(board, player, pos.x, pos.y);
+       win = checkWinOrNotAtPosition(board, pos.x, pos.y, player);
        if (win) {
            printResult(player);
            break;
@@ -32,7 +46,7 @@ void gameLoop(twoDimensionalArray board, roundHandler sente, roundHandler gote, 
 }
 
 void doubleModeHandler() {
-    twoDimensionalArray board = initBoard();
+    int (*board)[15] = initBoard();
     clearBoard(board);
     setInitiative(1);
     gameLoop(board, doubleModeMove, doubleModeMove, 1);
@@ -43,21 +57,16 @@ void singleModeHandler() {
     setInitiative(chooseInitiative());
 //    initiative = chooseInitiative();
     int difficulty = chooseDifficulty();
-    twoDimensionalArray board = initBoard();
+    int (*board)[15] = initBoard();
+    reinitialize();
     roundHandler AINext = difficulty == 1 ? stupidAINext : geniusAINext;
     if (getInitiative() == 1) {
         gameLoop(board, doubleModeMove, AINext, HUMAN);
-    } else if (getInitiative() == 2) {
+    } else /*if (getInitiative() == 2)*/ {
         gameLoop(board, AINext, doubleModeMove, COMPUTER);
     }
-}
-
-int getInitiative() {
-    return initiative;
-}
-
-void setInitiative(int x) {
-    initiative = x;
+    terminate();
+    AINext(board, 0);
 }
 
 void Regret() {

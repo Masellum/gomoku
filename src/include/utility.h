@@ -1,8 +1,6 @@
 #ifndef _UTILITY_H
 #define _UTILITY_H
 
-#include "vector.h"
-
 #include <stdbool.h>
 
 // Define value of situation of single chess
@@ -15,19 +13,19 @@
 #define TWO_BLOCKED 10 // 眠二
 #define ONE 10 // 单子
 #define ONE_BLOCKED 5
-#define DOUBLE_FOUR_BLOCKED 10000 // 双冲四
-#define FOUR_BLOCKED_THREE 10000 // 冲四活三
-#define DOUBLE_THREE 5000 // 双活三
-#define THREE_THREE_BLOCKED 2500 // 活三眠三
-#define DOUBLE_TWO 500 // 双活二
+//#define DOUBLE_FOUR_BLOCKED 10000 // 双冲四
+//#define FOUR_BLOCKED_THREE 10000 // 冲四活三
+//#define DOUBLE_THREE 5000 // 双活三
+//#define THREE_THREE_BLOCKED 2500 // 活三眠三
+//#define DOUBLE_TWO 500 // 双活二
 
 #define COMPUTER 1
 #define HUMAN 2
 
-#define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
+//#define max(a,b) \
+//   ({ __typeof__ (a) _a = (a); \
+//       __typeof__ (b) _b = (b); \
+//     _a > _b ? _a : _b; })
 
 
 /**
@@ -35,7 +33,7 @@
  */
 typedef struct {
     int x, y;
-    int role;
+    int player;
 } Position;
 
 /**
@@ -45,20 +43,29 @@ typedef struct {
  * @param empty How many pieces are ahead of the empty position
  * @return The total score of given series of pieces
  */
-int countToScore(int count, int block, int empty);
+//int countToScore(int count, int block, int empty);
 
 /**
  * Evaluate the score of a position on only one direction.
  * We assume that the left top corner of the board is (0, 0), x-axis horizontal and y-axis is vertical.
  * @param direction from 0 to 3 stands for -, |, /, \
  */
-int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int role, int direction);
+int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int player, int direction);
+
+/**
+ * It behaves as its name.
+ * @param pComputerScore pointer to return the score of the position for computer
+ * @param pHumanScore pointer to return the score of the position for human
+ * @param direction from 0 to 3 stands for -, |, / and \
+ */
+void updateScoreOfPositionOnSingleDirection(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y,
+                                            int direction);
 
 /**
  * Convert number standing for one player to the one standing for another player,
  * i.e. swap 1 and 2.
  */
-int reverseRole(int role);
+int reverseRole(int player);
 
 /**
  * Check if a given position (x, y) has <i>count</i> neighbors in no more than <i>distance</i> steps.

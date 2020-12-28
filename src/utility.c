@@ -177,15 +177,13 @@ searchOnOneDirection:
 }
 
 void updateScoreOfPositionOnSingleDirection(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y,
-                                            int direction) {
-    int player = board[x][y], score;
+                                            int direction, int coefficient) {
+    int player = board[x][y];
     if (player != HUMAN) {
-        score = evaluatePositionOnSingleDirection(board, x, y, COMPUTER, direction);
-        *pComputerScore += score;
+        *pComputerScore += coefficient * evaluatePositionOnSingleDirection(board, x, y, COMPUTER, direction);
     } else *pComputerScore = 0;
     if (player != COMPUTER) {
-        score = evaluatePositionOnSingleDirection(board, x, y, HUMAN, direction);
-        *pHumanScore += score;
+        *pHumanScore += coefficient * evaluatePositionOnSingleDirection(board, x, y, HUMAN, direction);
     } else *pHumanScore = 0;
 }
 

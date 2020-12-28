@@ -32,6 +32,8 @@ void *vectorAt(Vector *v, size_t index);
 
 Vector vectorConcatenate(Vector a, Vector b);
 
+Vector vectorConcatenateAndClear(Vector a, Vector b);
+
 void vectorCopy(Vector *destination, Vector *source);
 
-#endif // VECTOR_H
+#endif // _VECTOR_H

@@ -3,6 +3,9 @@
 #include "vector.h"
 #include "board.h"
 
+#ifdef _DEBUG
+#include <stdio.h>
+#endif
 #include <stdlib.h>
 #include <limits.h>
 
@@ -43,20 +46,47 @@ void updateScoreOfBoard(int board[15][15], int computerScoreArray[15][15], int h
         }
     }
 }
+void updateScoreOfPosition(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y) {
+    *pHumanScore = *pComputerScore = 0;
 
-void updateScoreOfPosition(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y, int distance) {
+}
+
+//
+//void prepareToUpdateScoreAroundPosition(int board[15][15], int *pComputerScore, int *pHumanScore,
+//                                        int x, int y, int distance) {
+//    int dx[] = {1, 0, -1, 1}, dy[] = {0, 1, 1, 1};
+//    for (int d = 0; d <= 3; ++d) {
+//        for (int i = -distance; i <= distance; ++i) {
+//            if (nx >= 0 && ny >= 0 && nx < 15 && ny < 15) {
+//                int player = board[nx][ny];
+//                if (player != HUMAN) {
+//                    *pComputerScore -= evaluatePositionOnSingleDirection(board, nx, ny, COMPUTER, d);
+//                }
+//                if (player != COMPUTER) {
+//                    *pHumanScore -= evaluatePositionOnSingleDirection(board, nx, ny, HUMAN, d);
+//                }
+//            }
+//        }
+//    }
+//}
+
+void updateScoreAroundPosition(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15],
+                               int x, int y, int distance, int coefficient) {
 #define nx (x + i * dx[d])
 #define ny (y + i * dy[d])
     int dx[] = {1, 0, -1, 1}, dy[] = {0, 1, 1, 1};
     for (int d = 0; d <= 3; ++d) {
         for (int i = -distance; i <= distance; ++i) {
-            if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) {
-                continue;
+            if (nx >= 0 && ny >= 0 && nx < 15 && ny < 15) {
+                updateScoreOfPositionOnSingleDirection(board, &computerScoreArray[nx][ny], &humanScoreArray[nx][ny],
+                                                       nx, ny, d, coefficient);
             }
-            updateScoreOfPositionOnSingleDirection(board, pComputerScore, pHumanScore, x, y, d);
         }
     }
+#undef nx
+#undef ny
 }
+
 
 int evaluate(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15], int player) {
     int maxScoreOfComputer = 0, maxScoreOfHuman = 0;
@@ -89,7 +119,8 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
 #define NEIGHBORS 11
 #define PB(V) vectorPushBack(modelsCount + (V), (void *)(&p))
 #define EMPTY(V) (modelsCount[(V)].count == 0)
-#define RT(V) { res = (V); goto clearVectors; }
+//#define RT(V) { res = (V); goto clearVectors; }
+#define RT(V) { vectorCopy(&res, &(V)); goto clearVectors; }
     Vector modelsCount[12];
     for (int i = 0; i < 12; ++i) {
         vectorInit(modelsCount + i, 250, sizeof(Position));
@@ -130,7 +161,7 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
             }
         }
     }
-    Vector res;
+    Vector res = (Vector){NULL, 0, 0, sizeof(Position)};
     if (!EMPTY(FIVES)) RT(modelsCount[FIVES])
     if (player == COMPUTER && !EMPTY(COMPUTER_FOURS)) RT(modelsCount[COMPUTER_FOURS])
     if (player == HUMAN && !EMPTY(HUMAN_FOURS)) RT(modelsCount[HUMAN_FOURS])
@@ -142,13 +173,22 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
            blockedFours = (player == COMPUTER ?
             vectorConcatenate(modelsCount[COMPUTER_BLOCKED_FOURS], modelsCount[HUMAN_BLOCKED_FOURS]) :
             vectorConcatenate(modelsCount[HUMAN_BLOCKED_FOURS], modelsCount[COMPUTER_BLOCKED_FOURS]));
-    if (fours.count != 0) RT(vectorConcatenate(fours, blockedFours))
+    if (fours.count != 0) {
+//        Vector v = vectorConcatenate(fours, blockedFours);
+//        vectorCopy(&res, &v);
+        res = vectorConcatenate(fours, blockedFours);
+        vectorDelete(&fours);
+        vectorDelete(&blockedFours);
+//        vectorDelete(&v);
+        goto clearVectors;
+    }
+//    if (fours.count != 0) RT(vectorConcatenate(fours, blockedFours))
 
     if (player == COMPUTER) {
-        res = vectorConcatenate(
-                vectorConcatenate(
-                        vectorConcatenate(
-                                vectorConcatenate(
+        res = vectorConcatenateAndClear(
+                vectorConcatenateAndClear(
+                        vectorConcatenateAndClear(
+                                vectorConcatenateAndClear(
                                         vectorConcatenate(modelsCount[COMPUTER_TWO_THREES],
                                                              modelsCount[HUMAN_TWO_THREES]),
                                         modelsCount[COMPUTER_BLOCKED_FOURS]),
@@ -158,10 +198,10 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
     }
 
     if (player == HUMAN) {
-        res = vectorConcatenate(
-                vectorConcatenate(
-                        vectorConcatenate(
-                                vectorConcatenate(
+        res = vectorConcatenateAndClear(
+                vectorConcatenateAndClear(
+                        vectorConcatenateAndClear(
+                                vectorConcatenateAndClear(
                                         vectorConcatenate(modelsCount[HUMAN_TWO_THREES],
                                                           modelsCount[COMPUTER_TWO_THREES]),
                                         modelsCount[HUMAN_BLOCKED_FOURS]),
@@ -173,10 +213,11 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
     if (modelsCount[COMPUTER_TWO_THREES].count != 0 || modelsCount[HUMAN_TWO_THREES].count != 0) {
         goto clearVectors;
     }
-    Vector twos;
+    Vector twos = (Vector){NULL, 0, 0, 0};
     if (player == COMPUTER) twos = vectorConcatenate(modelsCount[COMPUTER_TWOS], modelsCount[HUMAN_TWOS]);
     else twos = vectorConcatenate(modelsCount[HUMAN_TWOS], modelsCount[COMPUTER_TWOS]);
-    res = vectorConcatenate(res, twos.count != 0 ? twos : modelsCount[NEIGHBORS]);
+    res = vectorConcatenateAndClear(res, twos.count != 0 ? twos : modelsCount[NEIGHBORS]);
+    vectorDelete(&twos);
 
 clearVectors:
     for (int i = 0; i < 12; ++i) {
@@ -188,32 +229,58 @@ clearVectors:
 SearchResult search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15],
                     int depth, int player, Vector *steps) {
     int e = evaluate(board, computerScoreArray, humanScoreArray, player);
-    SearchResult result = (SearchResult){e, *steps};
+    SearchResult result;
+    result.score = e;
+    result.steps.sizeOfVal = sizeof(Position);
+    result.steps.innerArray = NULL;
+    vectorCopy(&result.steps, steps);
     if (depth <= 0 || e >= FIVE || e <= -FIVE) {
         return result;
     }
-    SearchResult best = (SearchResult){INT_MIN, *steps};
+//    SearchResult best = (SearchResult){INT_MIN, *steps};
+    SearchResult best;
+    best.score = INT_MIN;;
+    best.steps.sizeOfVal = sizeof(Position);
+    best.steps.innerArray = NULL;
+    vectorCopy(&best.steps, steps);
     Vector positions = generateListOfAvailablePositions(board, computerScoreArray, humanScoreArray, player);
-    if (positions.count == 0) return result;
+#ifdef _DEBUG
+    for (int i = 0; i < positions.count; ++i) {
+        printf("%d %d\n", (*(Position *)(vectorAt(&positions, i))).x, (*(Position *)(vectorAt(&positions, i))).y);
+    }
+#endif
+    if (positions.count == 0) {
+        vectorDelete(&best.steps);
+        vectorDelete(&positions);
+        return result;
+    }
+    SearchResult r;
     for (int i = 0; i < positions.count; ++i) {
         Position p = *((Position *)(vectorAt(&positions, i)));
+        updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, -1);
         putChess(board, player, p.x, p.y);
-        updateScoreOfPosition(board, &computerScoreArray[p.x][p.y], &humanScoreArray[p.x][p.y], p.x, p.y, 5);
+        updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, 1);
 //        Vector newStep = (Vector){NULL, 0, 0, 0};
 //        vectorCopy(&newStep, steps);
 //        vectorPushBack(&newStep, &p);
 //        SearchResult r = search(board, computerScoreArray, humanScoreArray,
 //                                depth - 1, reverseRole(player), &newStep);
         vectorPushBack(steps, &p);
-        SearchResult r = search(board, computerScoreArray, humanScoreArray, depth - 1, reverseRole(player), steps);
+        r = search(board, computerScoreArray, humanScoreArray, depth - 1, reverseRole(player), steps);
         vectorPopBack(steps);
         r.score *= -1;
+        updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, -1);
         removeChess(board, p.x, p.y);
-        updateScoreOfPosition(board, &computerScoreArray[p.x][p.y], &humanScoreArray[p.x][p.y], p.x, p.y, 5);
+        updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, 1);
         if (r.score > best.score) {
-            best = r;
+//            best.steps.sizeOfVal =
+            vectorCopy(&best.steps, &r.steps);
+            best.score = r.score;
         }
+        vectorDelete(&r.steps);
     }
+    vectorDelete(&result.steps);
+    vectorDelete(&positions);
     return best;
 }
 
@@ -235,9 +302,11 @@ Position AINext(int board[15][15], int player, int depth) {
     if (!initialized) {
         if (computerScoreArray != NULL) {
             free(computerScoreArray);
+            computerScoreArray = NULL;
         }
         if (humanScoreArray != NULL) {
             free(humanScoreArray);
+            humanScoreArray = NULL;
         }
         if (terminated) return (Position){0, 0, 0};
         initialized = true;
@@ -245,20 +314,28 @@ Position AINext(int board[15][15], int player, int depth) {
         humanScoreArray = calloc(15, 15 * sizeof(int));
 //        computerScoreArray = (twoDimensionalArray)(calloc(15, 15 * sizeof(int)));
 //        humanScoreArray = (twoDimensionalArray)(calloc(15, 15 * sizeof(int)));
+
+        if (isPositionAvailable(board, (Position){6, 6, COMPUTER})) {
+            return (Position){6, 6, COMPUTER};
+        } else {
+            return (Position){7, 7, COMPUTER};
+        }
     }
     Vector steps;
     vectorInit(&steps, 5, sizeof(Position));
     SearchResult sr = search(board, computerScoreArray, humanScoreArray, depth, COMPUTER, &steps);
-    Position res = *((Position *)(vectorAt(&sr.steps, sr.steps.count - 1)));
+//    Position res = *((Position *)(vectorAt(&sr.steps, sr.steps.count - 1)));
+    Position res = *((Position *)(vectorAt(&sr.steps, 0)));
     vectorDelete(&steps);
+    vectorDelete(&sr.steps);
     return res;
 
 }
 
 Position stupidAINext(int board[15][15], int player) {
-    return AINext(board, player, 2);
+    return AINext(board, player, 3);
 }
 
 Position geniusAINext(int board[15][15], int player) {
-    return AINext(board, player, 4);
+    return AINext(board, player, 5);
 }

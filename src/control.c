@@ -4,6 +4,9 @@
 #include "board.h"
 
 #include <stdbool.h>
+#ifdef _DEBUG
+#include <stdio.h>
+#endif
 
 static int initiative;
 
@@ -34,6 +37,13 @@ void gameLoop(int board[15][15], roundHandler sente, roundHandler gote, int play
                sendMessage("操作不合法！请重新选择操作。");
            } else break;
        }
+#ifdef _DEBUG
+       if (_initiative) {
+           printf("黑棋落子于：(%d, %d)\n", pos.x + 1, pos.y + 1);
+       } else {
+           printf("白棋落子于：(%d, %d)\n", pos.x + 1, pos.y + 1);
+       }
+#endif
        putChess(board, player, pos.x, pos.y);
        win = checkWinOrNotAtPosition(board, pos.x, pos.y, player);
        if (win) {
@@ -54,17 +64,18 @@ void doubleModeHandler() {
 }
 
 void singleModeHandler() {
+//    setInitiative(reverseRole(chooseInitiative()));
     setInitiative(chooseInitiative());
-//    initiative = chooseInitiative();
     int difficulty = chooseDifficulty();
     int (*board)[15] = initBoard();
     reinitialize();
     roundHandler AINext = difficulty == 1 ? stupidAINext : geniusAINext;
-    if (getInitiative() == 1) {
+    if (getInitiative() == 2) {
         gameLoop(board, doubleModeMove, AINext, HUMAN);
     } else /*if (getInitiative() == 2)*/ {
         gameLoop(board, AINext, doubleModeMove, COMPUTER);
     }
+    reinitialize();
     terminate();
     AINext(board, 0);
 }

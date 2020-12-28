@@ -24,7 +24,7 @@ int evaluatePosition(int board[15][15], int x, int y, int role);
 /**
  * To be exactly, update score of positions <i>around</i> a position within the given distance.
  */
-//void updateScoreOfPosition(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y, int distance);
+//void updateScoreAroundPosition(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y, int distance);
 
 
 /**

@@ -59,7 +59,7 @@ int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int playe
  * @param direction from 0 to 3 stands for -, |, / and \
  */
 void updateScoreOfPositionOnSingleDirection(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y,
-                                            int direction);
+                                            int direction, int coefficient);
 
 /**
  * Convert number standing for one player to the one standing for another player,

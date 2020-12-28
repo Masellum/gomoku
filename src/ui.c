@@ -68,7 +68,7 @@ void showTablet(int board[15][15]) {
 }
 
 void sendMessage(char message[]) {
-    printf("%s", message);
+    printf("%s\n", message);
 }
 
 Position askNext(int board[15][15], int player) {

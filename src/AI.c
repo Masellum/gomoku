@@ -2,6 +2,7 @@
 #include "utility.h"
 #include "vector.h"
 #include "board.h"
+#include "ui.h"
 
 #ifdef _DEBUG
 #include <stdio.h>
@@ -99,7 +100,7 @@ int evaluate(int board[15][15], int computerScoreArray[15][15], int humanScoreAr
             }
         }
     }
-    return (player == COMPUTER ? 1 : -1) * (maxScoreOfComputer + maxScoreOfHuman);
+    return (player == COMPUTER ? 1 : -1) * (maxScoreOfComputer - maxScoreOfHuman);
 }
 
 Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArray[15][15],
@@ -226,8 +227,9 @@ clearVectors:
     return res;
 }
 
-SearchResult search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15],
-                    int depth, int player, Vector *steps) {
+SearchResult
+search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15], int depth, int player,
+       Vector *steps, int alpha, int beta) {
     int e = evaluate(board, computerScoreArray, humanScoreArray, player);
     SearchResult result;
     result.score = e;
@@ -238,11 +240,6 @@ SearchResult search(int board[15][15], int computerScoreArray[15][15], int human
         return result;
     }
 //    SearchResult best = (SearchResult){INT_MIN, *steps};
-    SearchResult best;
-    best.score = INT_MIN;;
-    best.steps.sizeOfVal = sizeof(Position);
-    best.steps.innerArray = NULL;
-    vectorCopy(&best.steps, steps);
     Vector positions = generateListOfAvailablePositions(board, computerScoreArray, humanScoreArray, player);
 #ifdef _DEBUG
     for (int i = 0; i < positions.count; ++i) {
@@ -250,10 +247,15 @@ SearchResult search(int board[15][15], int computerScoreArray[15][15], int human
     }
 #endif
     if (positions.count == 0) {
-        vectorDelete(&best.steps);
+//        vectorDelete(&best.steps);
         vectorDelete(&positions);
         return result;
     }
+    SearchResult best;
+    best.score = INT_MIN;
+    best.steps.sizeOfVal = sizeof(Position);
+    best.steps.innerArray = NULL;
+    vectorCopy(&best.steps, steps);
     SearchResult r;
     for (int i = 0; i < positions.count; ++i) {
         Position p = *((Position *)(vectorAt(&positions, i)));
@@ -266,7 +268,9 @@ SearchResult search(int board[15][15], int computerScoreArray[15][15], int human
 //        SearchResult r = search(board, computerScoreArray, humanScoreArray,
 //                                depth - 1, reverseRole(player), &newStep);
         vectorPushBack(steps, &p);
-        r = search(board, computerScoreArray, humanScoreArray, depth - 1, reverseRole(player), steps);
+        r = search(board, computerScoreArray, humanScoreArray,
+                   depth - 1, reverseRole(player), steps, INT_MAX, INT_MIN);
+//        r = search(board, computerScoreArray, humanScoreArray, depth - 1, player, steps);
         vectorPopBack(steps);
         r.score *= -1;
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, -1);
@@ -321,9 +325,10 @@ Position AINext(int board[15][15], int player, int depth) {
             return (Position){7, 7, COMPUTER};
         }
     }
+    sendMessage("AI思考中……");
     Vector steps;
     vectorInit(&steps, 5, sizeof(Position));
-    SearchResult sr = search(board, computerScoreArray, humanScoreArray, depth, COMPUTER, &steps);
+    SearchResult sr = search(board, computerScoreArray, humanScoreArray, depth, COMPUTER, &steps, INT_MAX, INT_MIN);
 //    Position res = *((Position *)(vectorAt(&sr.steps, sr.steps.count - 1)));
     Position res = *((Position *)(vectorAt(&sr.steps, 0)));
     vectorDelete(&steps);
@@ -333,9 +338,9 @@ Position AINext(int board[15][15], int player, int depth) {
 }
 
 Position stupidAINext(int board[15][15], int player) {
-    return AINext(board, player, 3);
+    return AINext(board, player, 2);
 }
 
 Position geniusAINext(int board[15][15], int player) {
-    return AINext(board, player, 5);
+    return AINext(board, player, 4);
 }

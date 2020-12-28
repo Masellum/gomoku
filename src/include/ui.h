@@ -52,8 +52,12 @@ void doubleModeHandler();
  * 用于把数字转化成具体棋子
  * use marco to avoid cross-platform unicode problem
  */
-#define transformChessPieces(flag) ((flag) == 0 ? "＋" : ((flag) == getInitiative() ? "●" : "○"))
+#define transformChessPieces(flag) ((flag) == 0 ? "＋" : ((flag) == getInitiative() ? "Ｘ" : "〇"))
 //char TransformChessPieces(int flag);
+
+#ifdef _DEBUG
+void printBoard();
+#endif
 
 
 /**

@@ -44,7 +44,13 @@ void gameLoop(int board[15][15], roundHandler sente, roundHandler gote, int play
            printf("白棋落子于：(%d, %d)\n", pos.x + 1, pos.y + 1);
        }
 #endif
+#ifdef _DEBUG
+       printBoard(board);
+#endif
        putChess(board, player, pos.x, pos.y);
+#ifdef _DEBUG
+       printBoard(board);
+#endif
        win = checkWinOrNotAtPosition(board, pos.x, pos.y, player);
        if (win) {
            printResult(player);
@@ -68,6 +74,7 @@ void singleModeHandler() {
     setInitiative(chooseInitiative());
     int difficulty = chooseDifficulty();
     int (*board)[15] = initBoard();
+    clearBoard(board);
     reinitialize();
     roundHandler AINext = difficulty == 1 ? stupidAINext : geniusAINext;
     if (getInitiative() == 2) {

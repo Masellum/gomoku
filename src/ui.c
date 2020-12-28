@@ -45,12 +45,29 @@ int chooseInitiative() {
     else return 0;
 }
 
+#ifdef _DEBUG
+void printBoard(int board[15][15]) {
+    printf("   ");
+    for (int i = 0; i < 15; ++i) {
+        printf("%-3i", i);
+    }
+    printf("\n");
+    for (int i = 0; i < 15; ++i) {
+        printf("%-3i", i);
+        for (int j = 0; j < 15; ++j) {
+            printf("%-3i", board[i][j]);
+        }
+        printf("\n");
+    }
+}
+#endif
+
 
 void showTablet(int board[15][15]) {
-    printf("    ");
+    printf("   Y");
     for (int i = 1; i <= 15; i++)
         printf("%-4d", i);
-    printf("\n\n");
+    printf("\n X\n");
     for (int i = 0; i < 15; i++) {
         printf("%2d  ", i + 1);
         for (int j = 0; j < 14; j++) {
@@ -62,7 +79,7 @@ void showTablet(int board[15][15]) {
         }
         printf("  ");
         for (int j = 1; j <= 15; j++)
-            printf("  ‖");
+            printf("  ｜");
         printf("\n");
     }
 }
@@ -87,7 +104,7 @@ Position askNext(int board[15][15], int player) {
             while (true) {
                 puts("请输入下棋的坐标,两坐标用空格隔开：");
                 scanf("%d%d", &a, &b);
-                if (!checkPositionAvailable(board, a, b)) {
+                if (!checkPositionAvailable(board, a - 1, b - 1)) {
                     puts("坐标不合法！请重新输入：");
                 } else break;
             }

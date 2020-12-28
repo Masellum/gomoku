@@ -1,5 +1,4 @@
 build
+release
 .idea
 .vscode
-cmake-build-debug
-/src/cmake-build-release/

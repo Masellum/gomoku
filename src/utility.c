@@ -1,14 +1,151 @@
 #include "utility.h"
-#include "vector.h"
-#include "map.h"
 
-#include <string.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
+int fixScore(int score) {
+    if (score < FOUR && score >= FOUR_BLOCKED) {
+        if (score >= FOUR_BLOCKED && score < (FOUR_BLOCKED + THREE)) {
+            return THREE;
+        } else if (score >= FOUR_BLOCKED + THREE && score < FOUR_BLOCKED * 2) {
+            return FOUR;
+        } else {
+            return FOUR * 2;
+        }
+    }
+    return score;
+}
+
+//int countToScore(int count, int blockHead, int blockTail, int empty) {
+//    if (empty <= 0) {
+//        if (count >= 5) return FIVE;
+////        if (blockHead == 0 && blockTail == 0) {
+//        if (blockHead + blockTail == 0) {
+//            switch (count) {
+//                case 4: return FOUR;
+//                case 3: return THREE;
+//                case 2: return TWO;
+//                case 1: return ONE;
+//            }
+//        }
+//        if (blockHead + blockTail == 1) {
+//            switch (count) {
+//                case 4: return FOUR_BLOCKED;
+//                case 3: return THREE_BLOCKED;
+//                case 2: return TWO_BLOCKED;
+//                case 1: return ONE_BLOCKED;
+//            }
+//        }
+//    } else if (empty == 1 || empty == count - 1) {
+//        if (count >= 6) return FIVE;
+//        if (blockHead + blockTail == 0) {
+//            switch (count) {
+//                case 5: return FOUR;
+//                case 4: return FOUR_BLOCKED;
+//                case 3: return THREE_BLOCKED;
+//                case 2: return TWO_BLOCKED;
+////                case 2: return ONE * 2;
+//            }
+//        } else if (blockHead == 1 && blockTail == 0) {
+//            switch (count) {
+//                case 5: return FOUR;
+//                case 4: return THREE;
+//                case 3: return TWO;
+//                case 2: return ONE * 2;
+//            }
+//        } else if (blockTail == 1 && blockHead == 1) {
+//            switch (count) {
+//                case 5: return FOUR;
+//                case 4: return THREE_BLOCKED;
+//                case 3: return TWO_BLOCKED;
+//                case 2: return ONE;
+//            }
+//        }
+//    } else if (empty == 2 || empty == count - 2) {
+//        if (count >= 7) return FIVE;
+//        if (blockHead + blockTail == 0) {
+//            return FOUR;
+////            switch (count) {
+////                case 6: return FOUR;
+////                case 5: return FOUR;
+////                case 4: return FOUR;
+////            }
+//        } else if (blockHead == 1) {
+//
+//        } else if (block == 1) {
+//            switch (count) {
+//                case 4: return FOUR_BLOCKED;
+//                case 5: return FOUR_BLOCKED;
+//                case 6: return FOUR;
+//            }
+//        } else if (block == 2) {
+//            switch (count) {
+//                case 4:
+//                case 5:
+//                case 6: return FOUR_BLOCKED;
+//            }
+//        }
+//    } else if (empty == 3 || empty == count - 3) {
+//        if (count >= 8) return FIVE;
+//        if (block == 0) {
+//            switch (count) {
+//                case 4:
+//                case 5: return THREE;
+//                case 6: return FOUR_BLOCKED;
+//                case 7: return FOUR;
+//            }
+//        } else if (block == 1) {
+//            switch (count) {
+//                case 4:
+//                case 5:
+//                case 6: return FOUR_BLOCKED;
+//                case 7: return FOUR;
+//            }
+//        } else if (block == 2) {
+//            switch (count) {
+//                case 4:
+//                case 5:
+//                case 6:
+//                case 7: return FOUR_BLOCKED;
+//            }
+//        }
+//    } else if (empty == 4 || empty == count - 4) {
+//        if (count >= 9) {
+//            return FIVE;
+//        }
+//        if (block == 0) {
+//            switch (count) {
+//                case 5:
+//                case 6:
+//                case 7:
+//                case 8: return FOUR;
+//            }
+//        } else if (block == 1) {
+//            switch (count) {
+//                case 4:
+//                case 5:
+//                case 6:
+//                case 7: return FOUR_BLOCKED;
+//                case 8: return FOUR;
+//            }
+//        } else if (block == 2) {
+//            switch (count) {
+//                case 5:
+//                case 6:
+//                case 7:
+//                case 8: return FOUR_BLOCKED;
+//            }
+//        }
+//    } else if (empty == 5 || empty == count - 5) {
+//        return FIVE;
+//    }
+//    return 0;
+//}
+
 int countToScore(int count, int block, int empty) {
-    if (empty <= 0) {
+    if (empty >= 5 || (empty > 0 && empty <= count - 5)) return FIVE;
+    else if (empty <= 0) {
         if (count >= 5) return FIVE;
+//        if (blockHead == 0 && blockTail == 0) {
         if (block == 0) {
             switch (count) {
                 case 4: return FOUR;
@@ -29,20 +166,47 @@ int countToScore(int count, int block, int empty) {
         if (count >= 6) return FIVE;
         if (block == 0) {
             switch (count) {
-                case 5: return FOUR;
-                case 4: return FOUR_BLOCKED;
-                case 3: return THREE;
-                case 2: return TWO / 2;
+                case 5:
+                    return FOUR;
+                case 4:
+                    return FOUR_BLOCKED;
+                case 3:
+                    return THREE;
+                case 2:
+                    return TWO / 2;
+//                case 5:
+//                case 4: return FOUR;
+//                case 3: return THREE;
+//                case 2: return TWO;
+//                case 2: return ONE * 2;
             }
         } else if (block == 1) {
             switch (count) {
-                case 5: return FOUR_BLOCKED;
-                case 4: return THREE_BLOCKED;
-                case 3: return THREE_BLOCKED;
-                case 2: return TWO_BLOCKED;
+                case 5:
+                case 4:
+                    return FOUR_BLOCKED;
+                case 3:
+                    return THREE_BLOCKED;
+                case 2:
+                    return TWO_BLOCKED;
+//                case 5:
+//                case 4: return FOUR;
+//                case 3: return FOUR_BLOCKED;
+//                case 2: return ONE * 2;
+            }
+        } else if (block == 2) {
+            switch (count) {
+                case 5:
+                case 4:
+                    return THREE_BLOCKED;
+                case 3:
+                    return TWO_BLOCKED;
+                case 2:
+                    return TWO_BLOCKED;
             }
         }
     } else if (empty == 2 || empty == count - 2) {
+//    } else if (empty == 2 || empty == count - 2 || empty == 3 || empty == count - 3) {
         if (count >= 7) return FIVE;
         if (block == 0) {
             switch (count) {
@@ -53,16 +217,16 @@ int countToScore(int count, int block, int empty) {
             }
         } else if (block == 1) {
             switch (count) {
-                case 3: return THREE_BLOCKED;
-                case 4: return FOUR_BLOCKED;
-                case 5: return FOUR_BLOCKED;
                 case 6: return FOUR;
+                case 5:
+                case 4: return FOUR_BLOCKED;
+                case 3: return THREE_BLOCKED;
             }
         } else if (block == 2) {
             switch (count) {
-                case 4:
+                case 6:
                 case 5:
-                case 6: return FOUR_BLOCKED;
+                case 4: return FOUR_BLOCKED;
             }
         }
     } else if (empty == 3 || empty == count - 3) {
@@ -93,31 +257,37 @@ int countToScore(int count, int block, int empty) {
         if (count >= 9) {
             return FIVE;
         }
+//        if (block == 0) {
+//            switch (count) {
+//                case 5:
+//                case 6:
+//                case 7:
+//                case 8: return FOUR;
+//            }
+//        } else if (block == 1) {
+//            switch (count) {
+//                case 4:
+//                case 5:
+//                case 6:
+//                case 7: return FOUR_BLOCKED;
+//                case 8: return FOUR;
+//            }
+//        } else if (block == 2) {
+//            switch (count) {
+//                case 5:
+//                case 6:
+//                case 7:
+//                case 8: return FOUR_BLOCKED;
+//            }
+//        }
         if (block == 0) {
-            switch (count) {
-                case 5:
-                case 6:
-                case 7:
-                case 8: return FOUR;
-            }
+            return FOUR;
         } else if (block == 1) {
-            switch (count) {
-                case 4:
-                case 5:
-                case 6:
-                case 7: return FOUR_BLOCKED;
-                case 8: return FOUR;
-            }
-        } else if (block == 2) {
-            switch (count) {
-                case 5:
-                case 6:
-                case 7:
-                case 8: return FOUR_BLOCKED;
-            }
+            if (count == 8) return FOUR;
+            else return FOUR_BLOCKED;
+        } else {
+            return FOUR_BLOCKED;
         }
-    } else if (empty == 5 || empty == count - 5) {
-        return FIVE;
     }
     return 0;
 }
@@ -133,15 +303,19 @@ int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int playe
         case 2: dx = -1; dy = 1; break;
         case 3: dx = 1; dy = 1; break;
     }
+    int i;
 searchOnOneDirection:
-    for (int i = 1;;++i) {
+    i = 0;
+    if (reversed == -1) ++i;
+    for (;;++i) {
         if (nx < 0 || ny < 0 || nx >= 15 || ny >= 15) {
             block++;
             break;
         }
         int t = board[nx][ny];
         if (t == 0) {
-            if (empty == -1 && board[nx + 1 * (dx != 0)][ny + 1 * (dy != 0)] == player) {
+//            if (empty == -1 && board[nx + 1 * (dx != 0)][ny + 1 * (dy != 0)] == player) {
+            if (empty == -1 && board[nx + 1 * dx * reversed][ny + 1 * dy * reversed] == player) {
                 if (reversed == 1) {
                     empty = count;
                 } else {
@@ -171,7 +345,7 @@ searchOnOneDirection:
     }
     count += counterCount;
 
-    return countToScore(count + 1, block, empty);
+    return countToScore(count, block, empty);
 #undef nx
 #undef ny
 }
@@ -203,4 +377,16 @@ bool hasNeighbor(int board[15][15], int x, int y, int distance, int count) {
         }
     }
     return false;
+}
+
+bool greaterThan(int a, int b) {
+    double threshold = 1.15, aa = a, bb = b;
+    return (bb >= 0) ? (aa >= (bb + 0.1) / threshold) : (aa >= (bb - 0.1) * threshold);
+}
+
+bool equalTo(int a, int b) {
+    double threshold = 1.15, aa = a, bb = b;
+    if (b == 0) bb = 0.01;
+    return (bb >= 0) ? ((aa >= bb / threshold) && (aa <= bb * threshold)) :
+                        ((aa >= bb * threshold) && (aa <= bb / threshold));
 }

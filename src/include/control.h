@@ -12,6 +12,8 @@
  */
 typedef Position (*roundHandler)(int board[15][15], int player);
 
+typedef void (*chessPutter)(int board[15][15], int player, Position pos);
+
 int getInitiative();
 //void setInitiative(int x);
 

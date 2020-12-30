@@ -20,12 +20,12 @@ bool isPositionAvailable(twoDimensionalArray board, Position pos) {
     return board[pos.x][pos.y] == 0;
 }
 
-void putChess(twoDimensionalArray board, int player, int x, int y) {
-    board[x][y] = player;
-}
-
 void removeChess(twoDimensionalArray board, int x, int y) {
     board[x][y] = 0;
+}
+
+void putChess(twoDimensionalArray board, int player, Position pos) {
+    board[pos.x][pos.y] = player;
 }
 
 bool checkWinOrNotAtPosition(twoDimensionalArray board, int x, int y, int player) {

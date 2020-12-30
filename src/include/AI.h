@@ -55,5 +55,7 @@ Position stupidAINext(int board[15][15], int player);//简单AI下棋子,并返�
 
 Position geniusAINext(int board[15][15], int player);//困难AI下棋子,并返回是否赢下比赛
 
+void AIPutChess(int board[15][15], int player, Position pos);
+
 #endif // _AI_H
 

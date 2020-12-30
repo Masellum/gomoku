@@ -4,13 +4,8 @@
 #include "board.h"
 #include "ui.h"
 
-#ifdef _DEBUG
-#include <stdio.h>
-#endif
 #include <stdlib.h>
 #include <limits.h>
-
-typedef int (*twoDimensionalArray)[15];
 
 static bool initialized = false, terminated = false;
 
@@ -47,10 +42,11 @@ void updateScoreOfBoard(int board[15][15], int computerScoreArray[15][15], int h
         }
     }
 }
-void updateScoreOfPosition(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y) {
-    *pHumanScore = *pComputerScore = 0;
 
-}
+//void updateScoreOfPosition(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y) {
+//    *pHumanScore = *pComputerScore = 0;
+//
+//}
 
 //
 //void prepareToUpdateScoreAroundPosition(int board[15][15], int *pComputerScore, int *pHumanScore,
@@ -94,10 +90,12 @@ int evaluate(int board[15][15], int computerScoreArray[15][15], int humanScoreAr
     for (int i = 0; i < 15; ++i) {
         for (int j = 0; j < 15; ++j) {
             if (board[i][j] == COMPUTER) {
-                maxScoreOfComputer += computerScoreArray[i][j];
+                maxScoreOfComputer += fixScore(computerScoreArray[i][j]);
             } else if (board[i][j] == HUMAN) {
-                maxScoreOfHuman += humanScoreArray[i][j];
+                maxScoreOfHuman += fixScore(humanScoreArray[i][j]);
             }
+//            maxScoreOfComputer += computerScoreArray[i][j];
+//            maxScoreOfHuman += humanScoreArray[i][j];
         }
     }
     return (player == COMPUTER ? 1 : -1) * (maxScoreOfComputer - maxScoreOfHuman);
@@ -130,14 +128,17 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
         for (int j = 0; j < 15; ++j) {
             Position p = (Position){i, j, player};
             if (board[i][j] == 0) {
-                if (hasNeighbor(board, i, j, 2, 2)) {
+//                if (hasNeighbor(board, i, j, 2, 2)) {
+                if (hasNeighbor(board, i, j, 2, 1)) {
                     int scoreOfHuman = humanScoreArray[i][j], scoreOfComputer = computerScoreArray[i][j];
 //                    int maxScore = max(scoreOfHuman, scoreOfComputer);
                     if (scoreOfComputer > FIVE || scoreOfHuman > FIVE) {
                         PB(FIVES);
-                    } else if (player == COMPUTER && scoreOfComputer >= FOUR) {
+//                    } else if (player == COMPUTER && scoreOfComputer >= FOUR) {
+                    } else if (scoreOfComputer >= FOUR) {
                         PB(COMPUTER_FOURS);
-                    } else if (player == HUMAN && scoreOfHuman >= FOUR) {
+//                    } else if (player == HUMAN && scoreOfHuman >= FOUR) {
+                    } else if (scoreOfHuman >= FOUR) {
                         PB(HUMAN_FOURS);
                     } else if (scoreOfComputer >= FOUR_BLOCKED) {
                         PB(COMPUTER_BLOCKED_FOURS);
@@ -156,6 +157,7 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
                     } else if (scoreOfHuman >= TWO) {
                         PB(HUMAN_TWOS);
                     } else {
+                        if (scoreOfHuman == 0 && scoreOfComputer == 0) continue;
                         PB(NEIGHBORS);
                     }
                 }
@@ -227,30 +229,26 @@ clearVectors:
     return res;
 }
 
-SearchResult
-search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15], int depth, int player,
-       Vector *steps, int alpha, int beta) {
+SearchResult search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15],
+                    int depth, int player, Vector *steps, int alpha, int beta) {
     int e = evaluate(board, computerScoreArray, humanScoreArray, player);
     SearchResult result;
     result.score = e;
     result.steps.sizeOfVal = sizeof(Position);
     result.steps.innerArray = NULL;
     vectorCopy(&result.steps, steps);
-    if (depth <= 0 || e >= FIVE || e <= -FIVE) {
+//    if (depth <= 0 || e >= FIVE || e <= -FIVE) {
+    if (depth <= 0 || greaterThan(e, FIVE) || equalTo(e, FIVE) || greaterThan(-FIVE, e)) {
         return result;
     }
 //    SearchResult best = (SearchResult){INT_MIN, *steps};
     Vector positions = generateListOfAvailablePositions(board, computerScoreArray, humanScoreArray, player);
-#ifdef _DEBUG
-    for (int i = 0; i < positions.count; ++i) {
-        printf("%d %d\n", (*(Position *)(vectorAt(&positions, i))).x, (*(Position *)(vectorAt(&positions, i))).y);
-    }
-#endif
     if (positions.count == 0) {
 //        vectorDelete(&best.steps);
         vectorDelete(&positions);
         return result;
     }
+    vectorDelete(&result.steps);
     SearchResult best;
     best.score = INT_MIN;
     best.steps.sizeOfVal = sizeof(Position);
@@ -260,7 +258,7 @@ search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15
     for (int i = 0; i < positions.count; ++i) {
         Position p = *((Position *)(vectorAt(&positions, i)));
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, -1);
-        putChess(board, player, p.x, p.y);
+        putChess(board, player, p);
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, 1);
 //        Vector newStep = (Vector){NULL, 0, 0, 0};
 //        vectorCopy(&newStep, steps);
@@ -269,21 +267,35 @@ search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15
 //                                depth - 1, reverseRole(player), &newStep);
         vectorPushBack(steps, &p);
         r = search(board, computerScoreArray, humanScoreArray,
-                   depth - 1, reverseRole(player), steps, INT_MAX, INT_MIN);
+                   depth - 1, reverseRole(player), steps, alpha, beta);
 //        r = search(board, computerScoreArray, humanScoreArray, depth - 1, player, steps);
         vectorPopBack(steps);
         r.score *= -1;
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, -1);
         removeChess(board, p.x, p.y);
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, 1);
-        if (r.score > best.score) {
-//            best.steps.sizeOfVal =
+//        if (r.score < alpha && player == HUMAN) {
+        if (player == HUMAN) {
+            if (greaterThan(alpha, r.score)) {
+                r.score = INT_MIN + 1;
+                vectorDelete(&positions);
+                return r;
+            }
+            beta = min(beta, best.score);
+        } else {
+            if (greaterThan(r.score, beta)) {
+                r.score = INT_MAX - 1;
+                vectorDelete(&positions);
+                return r;
+            }
+            alpha = max(alpha, best.score);
+        }
+        if (greaterThan(r.score, best.score)) {
             vectorCopy(&best.steps, &r.steps);
             best.score = r.score;
         }
         vectorDelete(&r.steps);
     }
-    vectorDelete(&result.steps);
     vectorDelete(&positions);
     return best;
 }
@@ -297,11 +309,8 @@ void terminate() {
     terminated = true;
 }
 
-#ifdef __GNUC__
-Position AINext(int board[15][15], __attribute__((unused)) int player, int depth) {
-#else
-Position AINext(int board[15][15], int player, int depth) {
-#endif
+Position communicateWithAI(int board[15][15], int player, int depth,
+                           bool tellingOrAsking, Position pos) {
     static int (*computerScoreArray)[15] = NULL, (*humanScoreArray)[15] = NULL;
     if (!initialized) {
         if (computerScoreArray != NULL) {
@@ -319,28 +328,47 @@ Position AINext(int board[15][15], int player, int depth) {
 //        computerScoreArray = (twoDimensionalArray)(calloc(15, 15 * sizeof(int)));
 //        humanScoreArray = (twoDimensionalArray)(calloc(15, 15 * sizeof(int)));
 
-        if (isPositionAvailable(board, (Position){6, 6, COMPUTER})) {
+        if (tellingOrAsking == false) {
             return (Position){6, 6, COMPUTER};
+//            if (isPositionAvailable(board, (Position){6, 6, COMPUTER})) {
+//                return (Position){6, 6, COMPUTER};
+//            } else {
+//                return (Position){7, 7, COMPUTER};
+//            }
         } else {
-            return (Position){7, 7, COMPUTER};
+            updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, pos.x, pos.y, 5, -1);
+            putChess(board, player, pos);
+            updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, pos.x, pos.y, 5, 1);
+            return pos;
         }
     }
-    sendMessage("AI思考中……");
-    Vector steps;
-    vectorInit(&steps, 5, sizeof(Position));
-    SearchResult sr = search(board, computerScoreArray, humanScoreArray, depth, COMPUTER, &steps, INT_MAX, INT_MIN);
+    if (tellingOrAsking == false) {
+        sendMessage("AI思考中……");
+        Vector steps;
+        vectorInit(&steps, 5, sizeof(Position));
+        SearchResult sr = search(board, computerScoreArray, humanScoreArray,
+                                 depth, COMPUTER, &steps, INT_MIN, INT_MAX);
 //    Position res = *((Position *)(vectorAt(&sr.steps, sr.steps.count - 1)));
-    Position res = *((Position *)(vectorAt(&sr.steps, 0)));
-    vectorDelete(&steps);
-    vectorDelete(&sr.steps);
-    return res;
-
+        Position res = *((Position *)(vectorAt(&sr.steps, 0)));
+        vectorDelete(&steps);
+        vectorDelete(&sr.steps);
+        return res;
+    } else {
+        updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, pos.x, pos.y, 5, -1);
+        putChess(board, player, pos);
+        updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, pos.x, pos.y, 5, 1);
+        return pos;
+    }
 }
 
 Position stupidAINext(int board[15][15], int player) {
-    return AINext(board, player, 2);
+    return communicateWithAI(board, player, 4, false, (Position) {-1, -1, 0});
 }
 
 Position geniusAINext(int board[15][15], int player) {
-    return AINext(board, player, 4);
+    return communicateWithAI(board, player, 6, false, (Position) {-1, -1, 0});
+}
+
+void AIPutChess(int board[15][15], int player, Position pos) {
+    communicateWithAI(board, player, -1, true, pos);
 }

@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #ifdef _DEBUG
 #include <stdio.h>
+
 #endif
 
 static int initiative;
@@ -22,7 +23,8 @@ Position doubleModeMove(int board[15][15], int player) {
     return askNext(board, player);
 }
 
-void gameLoop(int board[15][15], roundHandler sente, roundHandler gote, int player) {
+void gameLoop(int board[15][15], roundHandler sente, roundHandler gote, chessPutter putter,
+              int player) {
    bool _initiative = true, win = false;
    while (true) {
        showTablet(board);
@@ -47,12 +49,13 @@ void gameLoop(int board[15][15], roundHandler sente, roundHandler gote, int play
 #ifdef _DEBUG
        printBoard(board);
 #endif
-       putChess(board, player, pos.x, pos.y);
+       putter(board, player, pos);
 #ifdef _DEBUG
        printBoard(board);
 #endif
        win = checkWinOrNotAtPosition(board, pos.x, pos.y, player);
        if (win) {
+           showTablet(board);
            printResult(player);
            break;
        }
@@ -65,7 +68,7 @@ void doubleModeHandler() {
     int (*board)[15] = initBoard();
     clearBoard(board);
     setInitiative(1);
-    gameLoop(board, doubleModeMove, doubleModeMove, 1);
+    gameLoop(board, doubleModeMove, doubleModeMove, putChess, 1);
     deleteBoard(board);
 }
 
@@ -78,9 +81,9 @@ void singleModeHandler() {
     reinitialize();
     roundHandler AINext = difficulty == 1 ? stupidAINext : geniusAINext;
     if (getInitiative() == 2) {
-        gameLoop(board, doubleModeMove, AINext, HUMAN);
+        gameLoop(board, doubleModeMove, AINext, AIPutChess, HUMAN);
     } else /*if (getInitiative() == 2)*/ {
-        gameLoop(board, AINext, doubleModeMove, COMPUTER);
+        gameLoop(board, AINext, doubleModeMove, AIPutChess, COMPUTER);
     }
     reinitialize();
     terminate();

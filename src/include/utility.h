@@ -4,9 +4,11 @@
 #include <stdbool.h>
 
 // Define value of situation of single chess
-#define FIVE 100000 // 连五
-#define FOUR 10000 // 活四
-#define FOUR_BLOCKED 100 // 冲四
+//#define FIVE 100000 // 连五
+#define FIVE 10000000 // 连五
+//#define FOUR 10000 // 活四
+#define FOUR 100000 // 活四
+#define FOUR_BLOCKED 10000 // 冲四
 #define THREE 1000 // 活三
 #define THREE_BLOCKED 100 // 眠三
 #define TWO 100 // 活二
@@ -22,10 +24,10 @@
 #define COMPUTER 1
 #define HUMAN 2
 
-//#define max(a,b) \
-//   ({ __typeof__ (a) _a = (a); \
-//       __typeof__ (b) _b = (b); \
-//     _a > _b ? _a : _b; })
+#define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
 
 
 /**
@@ -35,6 +37,8 @@ typedef struct {
     int x, y;
     int player;
 } Position;
+
+int fixScore(int score);
 
 /**
  * Calculate the total score of a series of pieces.
@@ -71,5 +75,9 @@ int reverseRole(int player);
  * Check if a given position (x, y) has <i>count</i> neighbors in no more than <i>distance</i> steps.
  */
 bool hasNeighbor(int board[15][15], int x, int y, int distance, int count);
+
+bool greaterThan(int a, int b);
+
+bool equalTo(int a, int b);
 
 #endif // _UTILITY_H

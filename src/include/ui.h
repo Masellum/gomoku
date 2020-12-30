@@ -3,9 +3,14 @@
 
 #include "utility.h"
 
-
 #include <time.h>
 #include <stdbool.h>
+
+/**
+ * 用于把数字转化成具体棋子
+ * use marco to avoid cross-platform unicode problem
+ */
+#define transformChessPieces(flag) ((flag) == 0 ? "　" : ((flag) == getInitiative() ? "Ｘ" : "〇"))
 
 /**
  * 打印欢迎信息
@@ -48,17 +53,9 @@ void singleModeHandler();
  */
 void doubleModeHandler();
 
-/**
- * 用于把数字转化成具体棋子
- * use marco to avoid cross-platform unicode problem
- */
-#define transformChessPieces(flag) ((flag) == 0 ? "　" : ((flag) == getInitiative() ? "Ｘ" : "〇"))
-//char TransformChessPieces(int flag);
-
 #ifdef _DEBUG
 void printBoard();
 #endif
-
 
 /**
  * 显示当前的棋盘 (15 * 15)
@@ -100,4 +97,4 @@ bool askReplay();
  */
 void printGoodbye();
 
-#endif // UI_H
+#endif // _UI_H

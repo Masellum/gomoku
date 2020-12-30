@@ -11,7 +11,8 @@ int main(void) {
         } else if (mode == 2) {
             doubleModeHandler();
         } else {
-            // TODO: Show warning and ask player to select again
+            sendMessage("输入不合法！请重新选择：");
+            continue;
         }
         if (!askReplay()) {
             break;

@@ -7,8 +7,19 @@
 #include <stdlib.h>
 #include <limits.h>
 
+/**
+ * Struct containing the search result.
+ */
+typedef struct {
+    int score;
+    Vector steps;
+} SearchResult;
+
 static bool initialized = false, terminated = false;
 
+/**
+ * Evaluate the score of a position, considering all directions. 评估一个位置的价值。
+ */
 int evaluatePosition(int (*board)[15], int x, int y, int player) {
     int result = 0;
     for (int i = 0; i <= 3; ++i) {
@@ -17,56 +28,10 @@ int evaluatePosition(int (*board)[15], int x, int y, int player) {
     return result;
 }
 
-#ifdef __GNUC__
-__attribute__((unused)) void updateScoreOfBoard(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15]) {
-#else
-void updateScoreOfBoard(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15]) {
-#endif
-
-    for (int i = 0; i < 15; ++i) {
-        for (int j = 0; j < 15; ++j) {
-            if (board[i][j] == 0) {
-                if (hasNeighbor(board, i, j, 2, 2)) {
-                    int computerScore = evaluatePosition(board, i, j, COMPUTER),
-                        humanScore = evaluatePosition(board, i, j, HUMAN);
-                    computerScoreArray[i][j] = computerScore;
-                    humanScoreArray[i][j] = humanScore;
-                }
-            } else if (board[i][j] == COMPUTER) {
-                computerScoreArray[i][j] = evaluatePosition(board, i, j, COMPUTER);
-                humanScoreArray[i][j] = 0;
-            } else {
-                humanScoreArray[i][j] = evaluatePosition(board, i, j, HUMAN);
-                computerScoreArray[i][j] = 0;
-            }
-        }
-    }
-}
-
-//void updateScoreOfPosition(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y) {
-//    *pHumanScore = *pComputerScore = 0;
-//
-//}
-
-//
-//void prepareToUpdateScoreAroundPosition(int board[15][15], int *pComputerScore, int *pHumanScore,
-//                                        int x, int y, int distance) {
-//    int dx[] = {1, 0, -1, 1}, dy[] = {0, 1, 1, 1};
-//    for (int d = 0; d <= 3; ++d) {
-//        for (int i = -distance; i <= distance; ++i) {
-//            if (nx >= 0 && ny >= 0 && nx < 15 && ny < 15) {
-//                int player = board[nx][ny];
-//                if (player != HUMAN) {
-//                    *pComputerScore -= evaluatePositionOnSingleDirection(board, nx, ny, COMPUTER, d);
-//                }
-//                if (player != COMPUTER) {
-//                    *pHumanScore -= evaluatePositionOnSingleDirection(board, nx, ny, HUMAN, d);
-//                }
-//            }
-//        }
-//    }
-//}
-
+/**
+ * To be exactly, update score of positions <i>around</i> a position within the given distance. 更新在一个位置的指定距离内所有位置的价值。
+ * @param coefficient 想对某个新放下了棋子的位置进行评估，需要先以 *coefficient* 为 **-1** 调用一次取消之前的评估，放下棋子后再以 **1** 调用一次。
+ */
 void updateScoreAroundPosition(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15],
                                int x, int y, int distance, int coefficient) {
 #define nx (x + i * dx[d])
@@ -84,7 +49,9 @@ void updateScoreAroundPosition(int board[15][15], int computerScoreArray[15][15]
 #undef ny
 }
 
-
+/**
+ * Evaluate the whole board using calculated data, not really calculating. 评估整个局面的价值。
+ */
 int evaluate(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15], int player) {
     int maxScoreOfComputer = 0, maxScoreOfHuman = 0;
     for (int i = 0; i < 15; ++i) {
@@ -94,13 +61,15 @@ int evaluate(int board[15][15], int computerScoreArray[15][15], int humanScoreAr
             } else if (board[i][j] == HUMAN) {
                 maxScoreOfHuman += fixScore(humanScoreArray[i][j]);
             }
-//            maxScoreOfComputer += computerScoreArray[i][j];
-//            maxScoreOfHuman += humanScoreArray[i][j];
         }
     }
     return (player == COMPUTER ? 1 : -1) * (maxScoreOfComputer - maxScoreOfHuman);
 }
 
+/**
+ * Generate a list of available positions for a certain player. 生成所有对给定玩家有意义的可落子位置。
+ * @return a vector includes the list, REMEMBER TO FREE. 一个包含所有位置的 **Vector**，使用完毕后务必释放内存。
+ */
 Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArray[15][15],
                                            int humanScoreArray[15][15], int player) {
 
@@ -128,16 +97,12 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
         for (int j = 0; j < 15; ++j) {
             Position p = (Position){i, j, player};
             if (board[i][j] == 0) {
-//                if (hasNeighbor(board, i, j, 2, 2)) {
                 if (hasNeighbor(board, i, j, 2, 1)) {
                     int scoreOfHuman = humanScoreArray[i][j], scoreOfComputer = computerScoreArray[i][j];
-//                    int maxScore = max(scoreOfHuman, scoreOfComputer);
                     if (scoreOfComputer > FIVE || scoreOfHuman > FIVE) {
                         PB(FIVES);
-//                    } else if (player == COMPUTER && scoreOfComputer >= FOUR) {
                     } else if (scoreOfComputer >= FOUR) {
                         PB(COMPUTER_FOURS);
-//                    } else if (player == HUMAN && scoreOfHuman >= FOUR) {
                     } else if (scoreOfHuman >= FOUR) {
                         PB(HUMAN_FOURS);
                     } else if (scoreOfComputer >= FOUR_BLOCKED) {
@@ -177,16 +142,12 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
             vectorConcatenate(modelsCount[COMPUTER_BLOCKED_FOURS], modelsCount[HUMAN_BLOCKED_FOURS]) :
             vectorConcatenate(modelsCount[HUMAN_BLOCKED_FOURS], modelsCount[COMPUTER_BLOCKED_FOURS]));
     if (fours.count != 0) {
-//        Vector v = vectorConcatenate(fours, blockedFours);
-//        vectorCopy(&res, &v);
         res = vectorConcatenate(fours, blockedFours);
         vectorDelete(&fours);
         vectorDelete(&blockedFours);
 //        vectorDelete(&v);
         goto clearVectors;
     }
-//    if (fours.count != 0) RT(vectorConcatenate(fours, blockedFours))
-
     if (player == COMPUTER) {
         res = vectorConcatenateAndClear(
                 vectorConcatenateAndClear(
@@ -212,7 +173,6 @@ Vector generateListOfAvailablePositions(int board[15][15], int computerScoreArra
                         modelsCount[HUMAN_THREES]),
                 modelsCount[COMPUTER_THREES]);
     }
-
     if (modelsCount[COMPUTER_TWO_THREES].count != 0 || modelsCount[HUMAN_TWO_THREES].count != 0) {
         goto clearVectors;
     }
@@ -229,6 +189,15 @@ clearVectors:
     return res;
 }
 
+/**
+ * Perform search and return the best result found. 进行搜索并返回找到的最优位置。
+ * @param depth The search depth. 搜索深度，最好为偶数。
+ * @param player The role when starting the search. 开始搜索时的玩家身份，外部调用时总应为 COMPUTER。
+ * @param steps A pointer pointing to the vector which stores the steps, should be initialized first. 指向存储步骤的向量的指针，应先被初始化。
+ * @param alpha The coefficient used to reduce search time. 剪枝用到的参数，外部调用时总应传入最小值。
+ * @param bete The coefficient used to reduce search time. 剪枝用到的参数，外部调用时总应传入最大值。
+ * @return The result containing the best score and steps. 存储着最优步骤及其得分的 **SearchResult** 对象。
+ */
 SearchResult search(int board[15][15], int computerScoreArray[15][15], int humanScoreArray[15][15],
                     int depth, int player, Vector *steps, int alpha, int beta) {
     int e = evaluate(board, computerScoreArray, humanScoreArray, player);
@@ -237,14 +206,11 @@ SearchResult search(int board[15][15], int computerScoreArray[15][15], int human
     result.steps.sizeOfVal = sizeof(Position);
     result.steps.innerArray = NULL;
     vectorCopy(&result.steps, steps);
-//    if (depth <= 0 || e >= FIVE || e <= -FIVE) {
     if (depth <= 0 || greaterThan(e, FIVE) || equalTo(e, FIVE) || greaterThan(-FIVE, e)) {
         return result;
     }
-//    SearchResult best = (SearchResult){INT_MIN, *steps};
     Vector positions = generateListOfAvailablePositions(board, computerScoreArray, humanScoreArray, player);
     if (positions.count == 0) {
-//        vectorDelete(&best.steps);
         vectorDelete(&positions);
         return result;
     }
@@ -260,21 +226,14 @@ SearchResult search(int board[15][15], int computerScoreArray[15][15], int human
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, -1);
         putChess(board, player, p);
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, 1);
-//        Vector newStep = (Vector){NULL, 0, 0, 0};
-//        vectorCopy(&newStep, steps);
-//        vectorPushBack(&newStep, &p);
-//        SearchResult r = search(board, computerScoreArray, humanScoreArray,
-//                                depth - 1, reverseRole(player), &newStep);
         vectorPushBack(steps, &p);
         r = search(board, computerScoreArray, humanScoreArray,
                    depth - 1, reverseRole(player), steps, alpha, beta);
-//        r = search(board, computerScoreArray, humanScoreArray, depth - 1, player, steps);
         vectorPopBack(steps);
         r.score *= -1;
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, -1);
         removeChess(board, p.x, p.y);
         updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, p.x, p.y, 5, 1);
-//        if (r.score < alpha && player == HUMAN) {
         if (player == HUMAN) {
             if (greaterThan(alpha, r.score)) {
                 r.score = INT_MIN + 1;
@@ -300,15 +259,29 @@ SearchResult search(int board[15][15], int computerScoreArray[15][15], int human
     return best;
 }
 
+/**
+ * Reinitialize the AI. AI 部分用闭包实现可持续的局部状态，每次游戏开始前应进行初始化。
+ */
 void reinitialize() {
     initialized = false;
     terminated = false;
 }
 
+/**
+ * Terminate the AI. 结束本局游戏中 AI 的生命周期。
+ */
 void terminate() {
     terminated = true;
 }
 
+/**
+ * Ask the AI to perform next move or tell the AI that a move is performed by another player. 询问 AI 下一着，或告知 AI 玩家的落子。
+ * @param player COMPUTER when asking, HUMAN when telling.
+ * @param depth The search depth which decides the intelligence of AI. 搜索深度，数值越大则 AI 思考越深入，则棋力越强。。
+ * @param tellingOrAsking **true** if telling, **false** if asking.
+ * @param pos The position of chess put by human, when asking it should be empty value. 玩家下棋的位置，在询问时应设为无意义值。
+ * @return The position selected by AI, or the given position when telling.
+ */
 Position communicateWithAI(int board[15][15], int player, int depth,
                            bool tellingOrAsking, Position pos) {
     static int (*computerScoreArray)[15] = NULL, (*humanScoreArray)[15] = NULL;
@@ -325,16 +298,8 @@ Position communicateWithAI(int board[15][15], int player, int depth,
         initialized = true;
         computerScoreArray = calloc(15, 15 * sizeof(int));
         humanScoreArray = calloc(15, 15 * sizeof(int));
-//        computerScoreArray = (twoDimensionalArray)(calloc(15, 15 * sizeof(int)));
-//        humanScoreArray = (twoDimensionalArray)(calloc(15, 15 * sizeof(int)));
-
         if (tellingOrAsking == false) {
             return (Position){6, 6, COMPUTER};
-//            if (isPositionAvailable(board, (Position){6, 6, COMPUTER})) {
-//                return (Position){6, 6, COMPUTER};
-//            } else {
-//                return (Position){7, 7, COMPUTER};
-//            }
         } else {
             updateScoreAroundPosition(board, computerScoreArray, humanScoreArray, pos.x, pos.y, 5, -1);
             putChess(board, player, pos);
@@ -348,7 +313,6 @@ Position communicateWithAI(int board[15][15], int player, int depth,
         vectorInit(&steps, 5, sizeof(Position));
         SearchResult sr = search(board, computerScoreArray, humanScoreArray,
                                  depth, COMPUTER, &steps, INT_MIN, INT_MAX);
-//    Position res = *((Position *)(vectorAt(&sr.steps, sr.steps.count - 1)));
         Position res = *((Position *)(vectorAt(&sr.steps, 0)));
         vectorDelete(&steps);
         vectorDelete(&sr.steps);
@@ -361,14 +325,25 @@ Position communicateWithAI(int board[15][15], int player, int depth,
     }
 }
 
+/**
+ * 低难度 AI 执行下一步。
+ * @return The position selected by AI.
+ */
 Position stupidAINext(int board[15][15], int player) {
     return communicateWithAI(board, player, 4, false, (Position) {-1, -1, 0});
 }
 
+/**
+ * 高难度 AI 执行下一步。
+ * @return The position selected by AI.
+ */
 Position geniusAINext(int board[15][15], int player) {
     return communicateWithAI(board, player, 6, false, (Position) {-1, -1, 0});
 }
 
+/**
+ * AI 的下棋管理器函数，实现了 **chessPutter** 接口。
+ */
 void AIPutChess(int board[15][15], int player, Position pos) {
     communicateWithAI(board, player, -1, true, pos);
 }

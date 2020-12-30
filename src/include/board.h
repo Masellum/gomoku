@@ -39,9 +39,6 @@ void putChess(twoDimensionalArray board, int player, Position pos);
  */
 bool checkWinOrNotAtPosition(twoDimensionalArray board, int x, int y, int player);
 
-//bool checkWinOrNot(twoDimensionalArray board);
-
-//bool checkIfBoardIsFull(twoDimensionalArray board);//检查棋盘是否填满
 bool checkPositionAvailable(twoDimensionalArray board, int a, int b);//返回在（a，b）落子是否符合规范，如果不符合，打印错误信息
 
 #endif // _BOARD_H

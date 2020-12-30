@@ -4,7 +4,6 @@
 #include "control.h"
 
 #include <stdio.h>
-//#include <time.h>
 
 
 void printHello() {
@@ -95,8 +94,7 @@ Position askNext(int board[15][15], int player) {
     while (true) {
         puts("轮到你了！请选择以下几种操作之一：");
         puts("1. 下棋");
-        puts("2. 悔棋");
-        puts("3. 认输");
+        puts("2. 认输");
         int choice;
         scanf("%d", &choice);
         if (choice == 1) {
@@ -111,12 +109,6 @@ Position askNext(int board[15][15], int player) {
             Position ret = {a - 1, b - 1, player};
             return ret;
         } else if (choice == 2) {
-            puts("你确认要悔棋吗？确认请输入1");
-            int tmp;
-            scanf("%d", &tmp);
-            if (tmp == 1) Regret();
-            else continue;
-        } else if (choice == 3) {
             puts("你确认要认输吗？确认请输入1");
             int tmp;
             scanf("%d", &tmp);

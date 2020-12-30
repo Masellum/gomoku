@@ -32,14 +32,6 @@ bool checkWinOrNotAtPosition(twoDimensionalArray board, int x, int y, int player
     return evaluatePosition(board, x, y, player) >= FIVE;
 }
 
-//bool checkWinOrNot(twoDimensionalArray board) {
-//    return 0;
-//}
-
-//bool checkIfBoardIsFull(twoDimensionalArray board) {
-//    return false;
-//}
-
 void recordPutChess(char *type, int player, int a, int b) {
     // TODO
 }

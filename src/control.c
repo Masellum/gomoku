@@ -4,9 +4,9 @@
 #include "board.h"
 
 #include <stdbool.h>
+
 #ifdef _DEBUG
 #include <stdio.h>
-
 #endif
 
 static int initiative;
@@ -19,6 +19,11 @@ void setInitiative(int x) {
     initiative = x;
 }
 
+/**
+ * @param board the board to put chess on
+ * @param player the given player
+ * @return whether the player won after the round
+ */
 Position doubleModeMove(int board[15][15], int player) {
     return askNext(board, player);
 }
@@ -73,7 +78,6 @@ void doubleModeHandler() {
 }
 
 void singleModeHandler() {
-//    setInitiative(reverseRole(chooseInitiative()));
     setInitiative(chooseInitiative());
     int difficulty = chooseDifficulty();
     int (*board)[15] = initBoard();
@@ -90,9 +94,6 @@ void singleModeHandler() {
     AINext(board, 0);
 }
 
-void Regret() {
-
-}
 
 void Surrender(int player) {
 

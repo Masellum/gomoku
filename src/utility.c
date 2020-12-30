@@ -2,6 +2,9 @@
 
 #include <stdbool.h>
 
+/**
+ * 对分数进行修正以改善盲目冲四的问题。
+ */
 int fixScore(int score) {
     if (score < FOUR && score >= FOUR_BLOCKED) {
         if (score >= FOUR_BLOCKED && score < (FOUR_BLOCKED + THREE)) {
@@ -15,137 +18,17 @@ int fixScore(int score) {
     return score;
 }
 
-//int countToScore(int count, int blockHead, int blockTail, int empty) {
-//    if (empty <= 0) {
-//        if (count >= 5) return FIVE;
-////        if (blockHead == 0 && blockTail == 0) {
-//        if (blockHead + blockTail == 0) {
-//            switch (count) {
-//                case 4: return FOUR;
-//                case 3: return THREE;
-//                case 2: return TWO;
-//                case 1: return ONE;
-//            }
-//        }
-//        if (blockHead + blockTail == 1) {
-//            switch (count) {
-//                case 4: return FOUR_BLOCKED;
-//                case 3: return THREE_BLOCKED;
-//                case 2: return TWO_BLOCKED;
-//                case 1: return ONE_BLOCKED;
-//            }
-//        }
-//    } else if (empty == 1 || empty == count - 1) {
-//        if (count >= 6) return FIVE;
-//        if (blockHead + blockTail == 0) {
-//            switch (count) {
-//                case 5: return FOUR;
-//                case 4: return FOUR_BLOCKED;
-//                case 3: return THREE_BLOCKED;
-//                case 2: return TWO_BLOCKED;
-////                case 2: return ONE * 2;
-//            }
-//        } else if (blockHead == 1 && blockTail == 0) {
-//            switch (count) {
-//                case 5: return FOUR;
-//                case 4: return THREE;
-//                case 3: return TWO;
-//                case 2: return ONE * 2;
-//            }
-//        } else if (blockTail == 1 && blockHead == 1) {
-//            switch (count) {
-//                case 5: return FOUR;
-//                case 4: return THREE_BLOCKED;
-//                case 3: return TWO_BLOCKED;
-//                case 2: return ONE;
-//            }
-//        }
-//    } else if (empty == 2 || empty == count - 2) {
-//        if (count >= 7) return FIVE;
-//        if (blockHead + blockTail == 0) {
-//            return FOUR;
-////            switch (count) {
-////                case 6: return FOUR;
-////                case 5: return FOUR;
-////                case 4: return FOUR;
-////            }
-//        } else if (blockHead == 1) {
-//
-//        } else if (block == 1) {
-//            switch (count) {
-//                case 4: return FOUR_BLOCKED;
-//                case 5: return FOUR_BLOCKED;
-//                case 6: return FOUR;
-//            }
-//        } else if (block == 2) {
-//            switch (count) {
-//                case 4:
-//                case 5:
-//                case 6: return FOUR_BLOCKED;
-//            }
-//        }
-//    } else if (empty == 3 || empty == count - 3) {
-//        if (count >= 8) return FIVE;
-//        if (block == 0) {
-//            switch (count) {
-//                case 4:
-//                case 5: return THREE;
-//                case 6: return FOUR_BLOCKED;
-//                case 7: return FOUR;
-//            }
-//        } else if (block == 1) {
-//            switch (count) {
-//                case 4:
-//                case 5:
-//                case 6: return FOUR_BLOCKED;
-//                case 7: return FOUR;
-//            }
-//        } else if (block == 2) {
-//            switch (count) {
-//                case 4:
-//                case 5:
-//                case 6:
-//                case 7: return FOUR_BLOCKED;
-//            }
-//        }
-//    } else if (empty == 4 || empty == count - 4) {
-//        if (count >= 9) {
-//            return FIVE;
-//        }
-//        if (block == 0) {
-//            switch (count) {
-//                case 5:
-//                case 6:
-//                case 7:
-//                case 8: return FOUR;
-//            }
-//        } else if (block == 1) {
-//            switch (count) {
-//                case 4:
-//                case 5:
-//                case 6:
-//                case 7: return FOUR_BLOCKED;
-//                case 8: return FOUR;
-//            }
-//        } else if (block == 2) {
-//            switch (count) {
-//                case 5:
-//                case 6:
-//                case 7:
-//                case 8: return FOUR_BLOCKED;
-//            }
-//        }
-//    } else if (empty == 5 || empty == count - 5) {
-//        return FIVE;
-//    }
-//    return 0;
-//}
-
+/**
+ * Calculate the total score of a series of pieces.
+ * @param count The amount of selected pieces
+ * @param block The amount of blocking pieces (Rival's pieces or walls)
+ * @param empty How many pieces are ahead of the empty position
+ * @return The total score of given series of pieces
+ */
 int countToScore(int count, int block, int empty) {
     if (empty >= 5 || (empty > 0 && empty <= count - 5)) return FIVE;
     else if (empty <= 0) {
         if (count >= 5) return FIVE;
-//        if (blockHead == 0 && blockTail == 0) {
         if (block == 0) {
             switch (count) {
                 case 4: return FOUR;
@@ -174,11 +57,6 @@ int countToScore(int count, int block, int empty) {
                     return THREE;
                 case 2:
                     return TWO / 2;
-//                case 5:
-//                case 4: return FOUR;
-//                case 3: return THREE;
-//                case 2: return TWO;
-//                case 2: return ONE * 2;
             }
         } else if (block == 1) {
             switch (count) {
@@ -189,10 +67,6 @@ int countToScore(int count, int block, int empty) {
                     return THREE_BLOCKED;
                 case 2:
                     return TWO_BLOCKED;
-//                case 5:
-//                case 4: return FOUR;
-//                case 3: return FOUR_BLOCKED;
-//                case 2: return ONE * 2;
             }
         } else if (block == 2) {
             switch (count) {
@@ -206,7 +80,6 @@ int countToScore(int count, int block, int empty) {
             }
         }
     } else if (empty == 2 || empty == count - 2) {
-//    } else if (empty == 2 || empty == count - 2 || empty == 3 || empty == count - 3) {
         if (count >= 7) return FIVE;
         if (block == 0) {
             switch (count) {
@@ -257,29 +130,6 @@ int countToScore(int count, int block, int empty) {
         if (count >= 9) {
             return FIVE;
         }
-//        if (block == 0) {
-//            switch (count) {
-//                case 5:
-//                case 6:
-//                case 7:
-//                case 8: return FOUR;
-//            }
-//        } else if (block == 1) {
-//            switch (count) {
-//                case 4:
-//                case 5:
-//                case 6:
-//                case 7: return FOUR_BLOCKED;
-//                case 8: return FOUR;
-//            }
-//        } else if (block == 2) {
-//            switch (count) {
-//                case 5:
-//                case 6:
-//                case 7:
-//                case 8: return FOUR_BLOCKED;
-//            }
-//        }
         if (block == 0) {
             return FOUR;
         } else if (block == 1) {
@@ -292,6 +142,9 @@ int countToScore(int count, int block, int empty) {
     return 0;
 }
 
+/**
+ * 在单个方向上对某个位置的分数进行评估
+ */
 int evaluatePositionOnSingleDirection(int board[15][15], int x, int y, int player, int direction) {
 #define nx (x + i * dx * reversed)
 #define ny (y + i * dy * reversed)
@@ -314,7 +167,6 @@ searchOnOneDirection:
         }
         int t = board[nx][ny];
         if (t == 0) {
-//            if (empty == -1 && board[nx + 1 * (dx != 0)][ny + 1 * (dy != 0)] == player) {
             if (empty == -1 && board[nx + 1 * dx * reversed][ny + 1 * dy * reversed] == player) {
                 if (reversed == 1) {
                     empty = count;
@@ -349,7 +201,11 @@ searchOnOneDirection:
 #undef nx
 #undef ny
 }
-
+/**
+ * 在单个方向上更新某个点的价值
+ * @param direction 0, 1, 2, 3 stand for | - / \.
+ * @param coefficient 想对某个新放下了棋子的位置进行评估，需要先以 *coefficient* 为 **-1** 调用一次取消之前的评估，放下棋子后再以 **1** 调用一次。
+ */
 void updateScoreOfPositionOnSingleDirection(int board[15][15], int *pComputerScore, int *pHumanScore, int x, int y,
                                             int direction, int coefficient) {
     int player = board[x][y];
@@ -361,6 +217,11 @@ void updateScoreOfPositionOnSingleDirection(int board[15][15], int *pComputerSco
     } else *pHumanScore = 0;
 }
 
+/**
+ * 反转玩家
+ * @param player
+ * @return
+ */
 int reverseRole(int player) { return player ^ 3; } // 1 ^ 3 == 2, 2 ^ 3 == 1
 
 bool hasNeighbor(int board[15][15], int x, int y, int distance, int count) {
@@ -379,11 +240,17 @@ bool hasNeighbor(int board[15][15], int x, int y, int distance, int count) {
     return false;
 }
 
+/**
+ * 非严格大于
+ */
 bool greaterThan(int a, int b) {
     double threshold = 1.15, aa = a, bb = b;
     return (bb >= 0) ? (aa >= (bb + 0.1) / threshold) : (aa >= (bb - 0.1) * threshold);
 }
 
+/**
+ * 非严格等于
+ */
 bool equalTo(int a, int b) {
     double threshold = 1.15, aa = a, bb = b;
     if (b == 0) bb = 0.01;

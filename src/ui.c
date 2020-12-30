@@ -112,7 +112,7 @@ Position askNext(int board[15][15], int player) {
             puts("你确认要认输吗？确认请输入1");
             int tmp;
             scanf("%d", &tmp);
-            if (tmp == 1) Surrender(player);
+            if (tmp == 1) return surrender(player);
             else continue;
         } else {
             puts("输入不合法！");

@@ -44,6 +44,11 @@ void gameLoop(int board[15][15], roundHandler sente, roundHandler gote, chessPut
                sendMessage("操作不合法！请重新选择操作。");
            } else break;
        }
+       if (pos.player == -1) {
+           showTablet(board);
+           printResult(reverseRole(player));
+           break;
+       }
 #ifdef _DEBUG
        if (_initiative) {
            printf("黑棋落子于：(%d, %d)\n", pos.x + 1, pos.y + 1);
@@ -94,7 +99,6 @@ void singleModeHandler() {
     AINext(board, 0);
 }
 
-
-void Surrender(int player) {
-
+Position surrender(int player) {
+    return (Position){-1, -1, -1};
 }

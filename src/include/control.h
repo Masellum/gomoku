@@ -30,6 +30,6 @@ void doubleModeHandler();
  */
 void singleModeHandler();
 
-void Surrender(int player);
+Position surrender(int player);
 
 #endif // _CONTROL_H
